@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { Phone, Mail, MapPin } from "lucide-react";
 
 // Using Vite's relative path resolution
@@ -11,6 +11,8 @@ export default function App() {
   const [showSplash, setShowSplash] = useState(true);
   const [fadeSplashText, setFadeSplashText] = useState(false);
   const [slideSplashPanel, setSlideSplashPanel] = useState(false);
+  const [logoCoords, setLogoCoords] = useState<{ x: number; y: number } | null>(null);
+  const headerLogoRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     // 1. Fade out the splash text after 1.5 seconds
@@ -35,26 +37,70 @@ export default function App() {
     };
   }, []);
 
+  useEffect(() => {
+    if (slideSplashPanel && headerLogoRef.current) {
+      const rect = headerLogoRef.current.getBoundingClientRect();
+      setLogoCoords({
+        x: rect.left,
+        y: rect.top,
+      });
+    }
+  }, [slideSplashPanel]);
+
   return (
     <div className="min-h-screen flex flex-col font-sans relative bg-white text-black" style={{ fontFamily: "'Syne', sans-serif" }}>
 
       {/* SPLASH SCREEN */}
       {showSplash && (
         <div
-          className={`fixed inset-0 bg-[#d00504] z-50 flex items-center justify-center transition-transform duration-[1000ms] ease-[cubic-bezier(0.16,1,0.3,1)] select-none ${slideSplashPanel ? "translate-y-[-100%]" : "translate-y-0"
+          className={`fixed inset-0 bg-white z-50 select-none transition-opacity duration-[1000ms] ease-out ${slideSplashPanel ? "opacity-0 pointer-events-none" : "opacity-100"
             }`}
         >
+          {/* Centered fading/blurring quote text container */}
           <div
-            className={`text-center px-6 transition-all duration-[800ms] ease-out ${fadeSplashText ? "opacity-0 translate-y-[-20px] scale-95" : "opacity-100 translate-y-0 scale-100 animate-reveal-text"
-              }`}
+            className="absolute inset-0 flex items-center justify-center"
+            style={{ pointerEvents: "none" }}
           >
-            <h1
-              className="text-4xl md:text-6xl font-bold tracking-tight text-black font-serif italic"
-              style={{ fontFamily: "'Playfair Display', serif" }}
+            <div
+              className={`text-center px-6 transition-all duration-[800ms] ease-out ${fadeSplashText ? "opacity-0 blur-[15px] translate-y-[-10px] scale-[1.05]" : "opacity-100 blur-0 translate-y-0 scale-100 animate-clarify-entrance"
+                }`}
             >
-              One Platform. <span className="text-white not-italic font-sans font-white">Many Opportunities.</span>
-            </h1>
-            <div className="w-16 h-[2px] bg-[#d00504] mx-auto mt-6 rounded-full animate-pulse" />
+              <h1
+                className="text-4xl md:text-6xl font-bold tracking-tight text-[#d00504] font-serif italic"
+                style={{ fontFamily: "'Playfair Display', serif" }}
+              >
+                One Platform. <span className="text-black not-italic font-sans">Many Opportunities.</span>
+              </h1>
+            </div>
+          </div>
+
+          {/* Flying logo container */}
+          <div
+            style={{
+              position: "fixed",
+              left: slideSplashPanel && logoCoords ? `${logoCoords.x}px` : "50%",
+              top: slideSplashPanel && logoCoords ? `${logoCoords.y}px` : "58%",
+              transform: slideSplashPanel && logoCoords ? "translate(0, 0) scale(1.0)" : "translate(-50%, -50%) scale(1.3)",
+              transition: "all 1200ms cubic-bezier(0.16, 1, 0.3, 1)",
+              zIndex: 60,
+              pointerEvents: "none",
+              transformOrigin: "top left",
+            }}
+          >
+            <div className="flex items-center gap-3 shrink-0">
+              <img
+                src={logoPlaceholder}
+                alt="Foodify Logo Icon"
+                className="w-12 h-12 md:w-16 md:h-16 object-cover rounded-xl"
+              />
+              <h1
+                className="text-4xl md:text-5xl font-bold tracking-tight leading-none"
+                style={{ fontFamily: "'Akzidenz-Grotesk', 'Helvetica Neue', Arial, sans-serif" }}
+              >
+                <span className="text-[#d00504]">foodify</span>
+                <span className="text-black">.ph</span>
+              </h1>
+            </div>
           </div>
         </div>
       )}
@@ -63,7 +109,11 @@ export default function App() {
       <header className="w-full px-6 py-4 md:px-12 lg:px-24 flex flex-col md:flex-row items-center justify-between gap-4 border-b-2 border-[#d00504] bg-white animate-fade-in-down">
 
         {/* 1:1 Logo and Text Group */}
-        <div className="flex items-center gap-3 shrink-0">
+        <div
+          ref={headerLogoRef}
+          className="flex items-center gap-3 shrink-0"
+          style={{ opacity: showSplash ? 0 : 1, transition: "opacity 0.2s" }}
+        >
           <img
             src={logoPlaceholder}
             alt="Foodify Logo Icon"
