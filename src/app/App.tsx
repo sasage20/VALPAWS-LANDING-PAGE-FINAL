@@ -5,6 +5,8 @@ import { Phone, Mail, MapPin } from "lucide-react";
 // @ts-ignore
 import logoPlaceholder from "../imports/foodify_logo.png";
 // @ts-ignore
+import favicon from "../imports/foodify_transparent_logo.png";
+// @ts-ignore
 import asset1 from "../imports/asset_1.png";
 
 export default function App() {
@@ -13,6 +15,20 @@ export default function App() {
   const [slideSplashPanel, setSlideSplashPanel] = useState(false);
   const [logoCoords, setLogoCoords] = useState<{ x: number; y: number } | null>(null);
   const headerLogoRef = useRef<HTMLDivElement>(null);
+
+  // Dynamically set the favicon using your logo
+  useEffect(() => {
+    let link = document.querySelector("link[rel~='icon']") as HTMLLinkElement | null;
+
+    if (!link) {
+      link = document.createElement("link");
+      link.rel = "icon";
+      document.head.appendChild(link);
+    }
+
+    link.type = "image/png";
+    link.href = favicon;
+  }, []);
 
   useEffect(() => {
     // 1. Fade out the splash text after 1.5 seconds
