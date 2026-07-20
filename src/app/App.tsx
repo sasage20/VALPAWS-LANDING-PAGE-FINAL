@@ -1,5 +1,32 @@
 import React, { useState, useEffect, useRef } from "react";
-import { Phone, Mail, MapPin } from "lucide-react";
+import {
+  Phone,
+  Mail,
+  MapPin,
+  LayoutDashboard,
+  TrendingUp,
+  UserCheck,
+  LogOut,
+  ShoppingBag,
+  PieChart,
+  CheckCircle2,
+  Sparkles,
+  HelpCircle,
+  Store,
+  Users,
+  DollarSign,
+  AlertTriangle,
+  MessageSquare,
+  Search,
+  ThumbsUp,
+  ThumbsDown,
+  Trash2,
+  Send,
+  Bot
+} from "lucide-react";
+
+// @ts-ignore
+import confetti from "canvas-confetti";
 
 // Using Vite's relative path resolution
 // @ts-ignore
@@ -7,14 +34,331 @@ import logoPlaceholder from "../imports/foodify_logo.png";
 // @ts-ignore
 import favicon from "../imports/foodify_transparent_logo.png";
 // @ts-ignore
-import asset1 from "../imports/asset_1.png";
+import asset1 from "../imports/placeholder_image.png";
+// @ts-ignore
+import dashboardImage from "../imports/foodify_dashboard.png";
+// @ts-ignore
+import redAsset from "../imports/red_asset.jpg";
+// @ts-ignore
+import yellowAsset from "../imports/yellow_asset.jpg";
+
+// Interactive dashboard features metadata
+const dashboardFeatures = [
+  {
+    id: 1,
+    title: "Unified Sidebar Navigation",
+    badge: "Navigation",
+    icon: LayoutDashboard,
+    description: "Easily navigate through Orders, Customers, Menu customization, Coupons, Reports, and Settings from a single, clean sidebar.",
+    benefits: ["One-click access to all store modules", "Collapsible layout for optimized workspace", "Real-time badge notifications for new events"],
+    position: { top: "13.90%", left: "30.06%" },
+    boxPosition: { left: "1.11%", top: "2.57%", width: "31.90%", height: "15.08%" },
+    target: { top: "38.0%", left: "32.5%" },
+  },
+  {
+    id: 2,
+    title: "Key Performance Metrics",
+    badge: "Metrics Overview",
+    icon: TrendingUp,
+    description: "Track your business health at a glance with real-time stats for Total Orders, Revenue, Average Order Value, and Pending Orders.",
+    benefits: ["Live revenue counters updating instantly", "Percentage comparisons vs the previous week", "Color-coded indicators for high priority items"],
+    position: { top: "13.90%", left: "63.08%" },
+    boxPosition: { left: "33.92%", top: "2.57%", width: "31.97%", height: "15.08%" },
+    target: { top: "38.0%", left: "49.0%" },
+  },
+  {
+    id: 3,
+    title: "Admin Settings & Profile",
+    badge: "Supplier Console",
+    icon: UserCheck,
+    description: "Manage your supplier account settings, view notifications, and access quick configurations directly from the header.",
+    benefits: ["Quick profile customization", "Direct access to help center & live chat", "Instant status toggles (Online/Offline)"],
+    position: { top: "13.63%", left: "96.15%" },
+    boxPosition: { left: "66.99%", top: "2.57%", width: "31.90%", height: "15.08%" },
+    target: { top: "31.0%", left: "68.0%" },
+  },
+  {
+    id: 4,
+    title: "Secure Session Management",
+    badge: "Security",
+    icon: LogOut,
+    description: "Securely sign out of your account with one click to keep your store, financial wallet, and transaction history safe.",
+    benefits: ["Instant local session clearing", "Protection for shared devices", "Auto-lock functionality on inactivity"],
+    position: { top: "95.09%", left: "30.29%" },
+    boxPosition: { left: "1.11%", top: "82.95%", width: "31.90%", height: "15.76%" },
+    target: { top: "51.0%", left: "32.5%" },
+  },
+  {
+    id: 5,
+    title: "Order Fulfillment Center",
+    badge: "Order Details",
+    icon: ShoppingBag,
+    description: "Monitor incoming reseller orders, check customer details, view ordered food items with images, and track order totals in real-time.",
+    benefits: ["Prepaid order confirmation via secure wallet", "Direct integration with shipping providers", "Instant status updates sent to resellers"],
+    position: { top: "95.05%", left: "63.26%" },
+    boxPosition: { left: "33.92%", top: "82.95%", width: "31.97%", height: "15.76%" },
+    target: { top: "58.0%", left: "45.0%" },
+  },
+  {
+    id: 6,
+    title: "Visual Status Analytics",
+    badge: "Order Insights",
+    icon: PieChart,
+    description: "A dynamic visual breakdown of order statuses (Delivered, Pending, Preparing, Cancelled) to optimize prep time and logistics.",
+    benefits: ["Interactive charts that update on hover", "Visual tracking of delivery efficiency", "Historical status trends to reduce cancellations"],
+    position: { top: "94.79%", left: "96.16%" },
+    boxPosition: { left: "66.99%", top: "82.95%", width: "31.90%", height: "15.76%" },
+    target: { top: "49.0%", left: "60.0%" },
+  },
+];
+
+const faqCategories = [
+  { id: "general", title: "General FAQs", icon: HelpCircle },
+  { id: "merchant", title: "Merchant FAQs", icon: Store },
+  { id: "reseller", title: "Reseller FAQs", icon: Users },
+  { id: "payment", title: "Payments & Fees", icon: DollarSign },
+  { id: "concerns", title: "Concerns & Objections", icon: AlertTriangle },
+];
+
+const faqData: Record<string, Array<{ q: string; a: string }>> = {
+  general: [
+    { q: "What is Foodify?", a: "Foodify is a sales and commerce system that connects local food merchants with a network of online resellers who market and sell products to their networks." },
+    { q: "Is Foodify a food delivery app?", a: "No. Foodify is a B2B2C sales system. We don't have a public customer marketplace; instead, resellers market your items and place orders through the dashboard." },
+    { q: "How is Foodify different from GrabFood or Foodpanda?", a: "While food apps wait for customers to browse, Foodify resellers actively pitch your menu to group chats, offices, and social circles, creating active demand." },
+    { q: "Is Foodify an MLM or networking business?", a: "No. Foodify has zero recruitment fees, downlines, or points systems. It is a pure retail commerce platform where resellers make money solely from product sales margins." },
+    { q: "Who can join Foodify?", a: "Both home cooks and established restaurants can join as merchants. Anyone looking to earn extra income from home can register as a reseller." },
+    { q: "Are sales guaranteed?", a: "While we can't guarantee a specific volume, putting your products in front of thousands of eager resellers dramatically increases your sales exposure." },
+    { q: "How does Foodify earn?", a: "Foodify charges a small flat platform fee per successful order to cover secure payment processing, server hosting, and merchant dashboard maintenance." }
+  ],
+  merchant: [
+    { q: "How can Foodify help my food business?", a: "We give you an instant sales force. Thousands of resellers promote your food, meaning you focus on cooking while they handle marketing and customer acquisition." },
+    { q: "Do we need to find our own resellers?", a: "No. Once you list your items, they instantly become available on the shared reseller catalog, and any registered Foodify reseller can start selling them." },
+    { q: "What is the process for merchants?", a: "1. Reseller makes a sale and prepays via wallet. 2. You receive the order on your dashboard. 3. You prepare the food. 4. Rider picks it up and delivers." },
+    { q: "Who prepares the food?", a: "You do. As a Foodify merchant, you are responsible for maintaining food quality, preparation, packaging, and food safety standard protocols." },
+    { q: "Who handles the delivery?", a: "Deliveries are handled by Foodify's integrated courier network (Grab, Lalamove, Borzo) or by your own delivery staff if you prefer." },
+    { q: "Can we set our own cut-off time?", a: "Yes. You can customize active preparation hours, order cut-offs, prep times, and menu availability directly on your dashboard settings." },
+    { q: "How are merchants protected from fake orders?", a: "All orders are prepaid by the reseller's digital wallet before they reach your kitchen. There is zero risk of fake orders or unpaid food waste." },
+    { q: "Are the orders Cash on Delivery?", a: "Resellers can collect COD from their end-customers, but the order placed in the Foodify system is always prepaid, protecting the merchant fully." },
+    { q: "Is there a fee to join as a merchant?", a: "Onboarding is free. There are no signup costs or monthly subscription fees. We only charge a small platform fee when you successfully make a sale." },
+    { q: "Does Foodify charge merchants a commission?", a: "No. You set your wholesale supplier price. The reseller adds their markup, and Foodify only takes a small flat processing fee per order." },
+    { q: "When will merchants receive their payouts?", a: "Payouts are processed daily. Your earnings accumulate in your digital wallet and can be transferred to your bank account or e-wallet instantly." },
+    { q: "What are the requirements for merchants?", a: "You need a clean cooking space, food preparation permit/barangay clearance, a smartphone to manage orders, and photos of your food items." },
+    { q: "Can home-based food businesses join?", a: "Yes! Home kitchens, commissary spaces, and micro-restaurants are all welcome, provided they meet our quality and hygiene standards." },
+    { q: "What is the merchant onboarding process?", a: "Sign up, upload your menu with photos, set your supplier prices, submit basic barangay or business permits, and get approved within 48 hours." }
+  ],
+  reseller: [
+    { q: "How can I earn as a reseller?", a: "You earn by selling merchant products. You add a markup to the merchant's wholesale price, and that entire markup is your profit." },
+    { q: "Is there a commission charged to resellers?", a: "No. Foodify is completely free for resellers. You keep 100% of the markup profit you set on the food products you sell." },
+    { q: "Do I need to cook?", a: "No. The merchant cooks and packs the food. Your only job is to promote the products, take orders, and submit them in the app." },
+    { q: "Do I need to keep inventory?", a: "No. Foodify operates on a dropshipping model. Food is prepared fresh to order by the merchant, so you never hold any inventory." },
+    { q: "Where can I sell the products?", a: "Anywhere! You can sell to neighbors, coworkers, family, or online via Facebook, Viber groups, Instagram, TikTok, and WhatsApp." },
+    { q: "Do I need to have many followers?", a: "No. Most resellers start by selling directly to close social circles, offices, local communities, and Viber groups, which requires no huge social following." },
+    { q: "Do I need capital?", a: "Only enough to fund your digital wallet to prepay the merchant. Since you collect customer payment first, you can use their money as capital!" },
+    { q: "How does the Foodify wallet work?", a: "You top up your digital wallet via GCash, Maya, or bank transfer. When you place an order, the wallet pays the merchant's wholesale price." },
+    { q: "Can customers pay through Cash on Delivery?", a: "Yes. You can offer COD to your customers. Once the rider collects the cash, the delivery partner remits it directly to your wallet." },
+    { q: "Who delivers the order to the customer?", a: "Deliveries are carried out by Foodify's integrated logistics riders. The system auto-books the courier from the merchant to the customer." },
+    { q: "Is training provided to resellers?", a: "Yes! We provide free guides, digital sales tips, onboarding webinars, and product marketing training to help you maximize your sales." },
+    { q: "Are ready-made marketing materials provided to resellers?", a: "Yes. Merchants upload high-quality food photos, promotional graphics, menus, and copy templates which you can copy and post instantly." },
+    { q: "How much does it cost to join as a reseller?", a: "Absolutely free. There are no registration fees, monthly subscription costs, or hidden licensing charges to become a reseller." }
+  ],
+  payment: [
+    { q: "What is the merchant fee?", a: "Foodify charges merchants a flat platform processing fee (typically 3-5% depending on volume) per successful completed order." },
+    { q: "What is the reseller commission?", a: "There is no fixed limit. You decide your own commission by setting the retail price. Typical markups range between 15% to 30%." },
+    { q: "When are payouts released?", a: "Earnings are available in your wallet as soon as the order is marked Delivered. You can request a bank transfer withdrawal at any time daily." },
+    { q: "Is there a listing fee for merchants?", a: "No. You can list as many menu items, packages, and seasonal variations as you want on our catalog for free." },
+    { q: "Are there any hidden charges?", a: "None. We are fully transparent: merchants pay a flat processing fee per order, and resellers enjoy 100% free catalog access." },
+    { q: "Who pays the delivery fee?", a: "The delivery fee is calculated by distance and is paid by the end-customer, which is added to their final checkout invoice." }
+  ],
+  concerns: [
+    { q: "What if Foodify is a scam?", a: "Foodify is a registered tech corporation. All payments go through SEC-compliant gateways, and your wallet balance can be withdrawn at any time." },
+    { q: "What if this is a networking business?", a: "It is not. You earn solely from selling actual food products. There are no recruiting bonuses, team referrals, or multi-level matrix structures." },
+    { q: "What happens if there are no orders?", a: "Nothing. Since onboarding is free, there are no ongoing costs. You can optimize your menu, adjust pricing, or try new listings anytime." },
+    { q: "Why not just run advertisements?", a: "Advertisements require upfront budgets with no guaranteed sales. Resellers cost nothing until they actually make a sale for you." },
+    { q: "Why not just open another branch?", a: "Opening a physical branch costs hundreds of thousands. Foodify lets you expand your sales reach virtually using your existing kitchen." },
+    { q: "What if I do not know how to use the system?", a: "Our user interface is designed for simplicity. We also provide step-by-step video tutorials and 24/7 chat support to guide you." },
+    { q: "Is there a contract?", a: "There are no lock-in contracts. You can close your account, suspend listings, or stop selling whenever you wish without penalty." },
+    { q: "When can we start?", a: "Immediately! Registration takes 5 minutes. Merchants can be active within 48 hours, and resellers can start sharing menus instantly." }
+  ]
+};
 
 export default function App() {
+  const [activeId, setActiveId] = useState(1);
   const [showSplash, setShowSplash] = useState(true);
   const [fadeSplashText, setFadeSplashText] = useState(false);
   const [slideSplashPanel, setSlideSplashPanel] = useState(false);
-  const [logoCoords, setLogoCoords] = useState<{ x: number; y: number } | null>(null);
+  const [onboardingVisible, setOnboardingVisible] = useState(false);
+  const [prefersReducedMotion, setPrefersReducedMotion] = useState(false);
   const headerLogoRef = useRef<HTMLDivElement>(null);
+
+  // Form split state
+  const [activeForm, setActiveForm] = useState<'split' | 'merchant' | 'reseller'>('split');
+
+  // Merchant Form States
+  const [merchantData, setMerchantData] = useState({
+    businessName: "",
+    contactName: "",
+    phone: "",
+    category: "Home Kitchen",
+    address: "",
+    permitId: ""
+  });
+  const [merchantSubmitted, setMerchantSubmitted] = useState(false);
+
+  // Reseller Form States
+  const [resellerData, setResellerData] = useState({
+    fullName: "",
+    email: "",
+    phone: "",
+    socialLink: "",
+    cashoutMethod: "GCash",
+    accountNumber: ""
+  });
+  const [resellerSubmitted, setResellerSubmitted] = useState(false);
+
+  const handleMerchantSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    setMerchantSubmitted(true);
+    // @ts-ignore
+    confetti({
+      particleCount: 100,
+      spread: 70,
+      origin: { y: 0.6 }
+    });
+  };
+
+  const handleResellerSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    setResellerSubmitted(true);
+    // @ts-ignore
+    confetti({
+      particleCount: 100,
+      spread: 70,
+      origin: { y: 0.6 }
+    });
+  };
+
+  const resetForms = () => {
+    setActiveForm('split');
+    setMerchantSubmitted(false);
+    setResellerSubmitted(false);
+    setMerchantData({
+      businessName: "",
+      contactName: "",
+      phone: "",
+      category: "Home Kitchen",
+      address: "",
+      permitId: ""
+    });
+    setResellerData({
+      fullName: "",
+      email: "",
+      phone: "",
+      socialLink: "",
+      cashoutMethod: "GCash",
+      accountNumber: ""
+    });
+  };
+
+  // Chat FAQs States & Handlers
+  const [activeCategory, setActiveCategory] = useState("general");
+  const [chatMessages, setChatMessages] = useState<Array<{
+    sender: 'user' | 'assistant';
+    text: string;
+    timestamp: string;
+    rating?: 'up' | 'down';
+  }>>([]);
+  const [isTyping, setIsTyping] = useState(false);
+  const [searchQuery, setSearchQuery] = useState("");
+
+  const searchResults = React.useMemo(() => {
+    if (!searchQuery.trim()) return [];
+    const query = searchQuery.toLowerCase();
+    const results: Array<{ q: string; a: string; categoryId: string; categoryTitle: string }> = [];
+
+    Object.keys(faqData).forEach((catId) => {
+      const category = faqCategories.find(c => c.id === catId);
+      const categoryTitle = category ? category.title : "";
+      faqData[catId].forEach((item) => {
+        if (item.q.toLowerCase().includes(query) || item.a.toLowerCase().includes(query)) {
+          results.push({ ...item, categoryId: catId, categoryTitle });
+        }
+      });
+    });
+
+    return results;
+  }, [searchQuery]);
+
+  const handleQuestionClick = (question: string, answer: string) => {
+    const now = new Date();
+    const timeStr = now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+
+    if (chatMessages.length > 0 && chatMessages[chatMessages.length - 1].text === question) return;
+
+    setChatMessages((prev) => [...prev, { sender: 'user', text: question, timestamp: timeStr }]);
+
+    setIsTyping(true);
+    const delay = Math.min(800, Math.max(400, answer.length * 3));
+    setTimeout(() => {
+      setIsTyping(false);
+      setChatMessages((prev) => [...prev, { sender: 'assistant', text: answer, timestamp: timeStr }]);
+
+      setTimeout(() => {
+        const chatBox = document.getElementById("chat-box");
+        if (chatBox) {
+          chatBox.scrollTop = chatBox.scrollHeight;
+        }
+      }, 50);
+    }, delay);
+  };
+
+  const handleFeedback = (idx: number, ratingType: 'up' | 'down') => {
+    setChatMessages((prev) =>
+      prev.map((msg, i) => (i === idx ? { ...msg, rating: ratingType } : msg))
+    );
+  };
+
+  const clearChat = () => {
+    setChatMessages([]);
+  };
+
+  const formatMessageText = (text: string) => {
+    if (text.includes("1. ") && text.includes("2. ")) {
+      const parts = text.split(/(?=\d+\.\s+)/);
+      return (
+        <div className="flex flex-col gap-2 my-1.5">
+          {parts.map((part, idx) => {
+            const match = part.match(/^(\d+)\.\s+(.*)$/);
+            if (match) {
+              return (
+                <div key={idx} className="flex gap-2.5 items-start leading-relaxed text-xs">
+                  <span className="flex items-center justify-center w-4.5 h-4.5 rounded-full bg-white text-[#d00504] text-[10px] font-black shrink-0 mt-0.5 shadow-sm">{match[1]}</span>
+                  <span className="flex-grow">{match[2]}</span>
+                </div>
+              );
+            }
+            return <p key={idx} className="leading-relaxed text-xs">{part}</p>;
+          })}
+        </div>
+      );
+    }
+
+    if (text.includes("Sign up, upload your menu")) {
+      const steps = text.split(", ");
+      return (
+        <div className="flex flex-col gap-2 my-1.5">
+          {steps.map((step, idx) => (
+            <div key={idx} className="flex gap-2.5 items-start leading-relaxed text-xs">
+              <span className="flex items-center justify-center w-4.5 h-4.5 rounded-full bg-white text-[#d00504] text-[10px] font-black shrink-0 mt-0.5 shadow-sm">{idx + 1}</span>
+              <span className="flex-grow first-letter:uppercase">{step}</span>
+            </div>
+          ))}
+        </div>
+      );
+    }
+
+    return <p className="leading-relaxed text-xs">{text}</p>;
+  };
+
 
   // Dynamically set the favicon using your logo
   useEffect(() => {
@@ -31,20 +375,20 @@ export default function App() {
   }, []);
 
   useEffect(() => {
-    // 1. Fade out the splash text after 1.5 seconds
+    // 1. Fade out the splash text after 2.5 seconds (allowing 1.1s readability after ascend completes)
     const textTimer = setTimeout(() => {
       setFadeSplashText(true);
-    }, 1500);
+    }, 2500);
 
-    // 2. Slide up the splash panel after 2.1 seconds
+    // 2. Slide up the splash panel after 3.8 seconds
     const panelTimer = setTimeout(() => {
       setSlideSplashPanel(true);
-    }, 2100);
+    }, 3800);
 
-    // 3. Unmount splash component completely after transition completes (3.1 seconds)
+    // 3. Unmount splash component completely after transition completes (5.5 seconds)
     const unmountTimer = setTimeout(() => {
       setShowSplash(false);
-    }, 3100);
+    }, 5500);
 
     return () => {
       clearTimeout(textTimer);
@@ -54,14 +398,67 @@ export default function App() {
   }, []);
 
   useEffect(() => {
-    if (slideSplashPanel && headerLogoRef.current) {
-      const rect = headerLogoRef.current.getBoundingClientRect();
-      setLogoCoords({
-        x: rect.left,
-        y: rect.top,
+    const mediaQuery = window.matchMedia('(prefers-reduced-motion: reduce)');
+    setPrefersReducedMotion(mediaQuery.matches);
+  }, []);
+
+  useEffect(() => {
+    if (showSplash) return;
+
+    const observerOptions = {
+      root: null,
+      rootMargin: "0px 0px -8% 0px",
+      threshold: 0.05,
+    };
+
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach((entry) => {
+        if (entry.isIntersecting) {
+          entry.target.classList.add("visible");
+          observer.unobserve(entry.target);
+        }
       });
+    }, observerOptions);
+
+    const revealElements = document.querySelectorAll(
+      ".reveal-wipe-left, .reveal-fade-up, .reveal-scale-in, .reveal-blur, .reveal-fade-in, .reveal-fade-left"
+    );
+    revealElements.forEach((el) => observer.observe(el));
+
+    const onboardingSection = document.getElementById("onboarding-section");
+    let onboardingObserver: IntersectionObserver | null = null;
+    if (onboardingSection) {
+      onboardingObserver = new IntersectionObserver((entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            setOnboardingVisible(true);
+            onboardingObserver?.unobserve(entry.target);
+          }
+        });
+      }, observerOptions);
+      onboardingObserver.observe(onboardingSection);
     }
-  }, [slideSplashPanel]);
+
+    return () => {
+      observer.disconnect();
+      if (onboardingObserver) onboardingObserver.disconnect();
+    };
+  }, [showSplash]);
+
+  // Dynamic CSS classes for Left (Merchant) and Right (Reseller) panels
+  const leftClasses = `relative overflow-hidden transition-all duration-[800ms] cubic-bezier(0.16, 1, 0.3, 1) flex flex-col items-center justify-center min-h-[480px] p-6 text-white group ${activeForm === 'split'
+    ? "flex-1 hover:flex-[1.4] bg-[#d00504] cursor-pointer hover:shadow-2xl"
+    : activeForm === 'merchant'
+      ? "flex-[99] bg-[#d00504] cursor-default"
+      : "flex-[0] opacity-0 pointer-events-none p-0 min-h-0"
+    }`;
+
+  const rightClasses = `relative overflow-hidden transition-all duration-[800ms] cubic-bezier(0.16, 1, 0.3, 1) flex flex-col items-center justify-center min-h-[480px] p-6 text-black group ${activeForm === 'split'
+    ? "flex-1 hover:flex-[1.4] bg-[#ffbc00] cursor-pointer hover:shadow-2xl"
+    : activeForm === 'reseller'
+      ? "flex-[99] bg-[#ffbc00] cursor-default"
+      : "flex-[0] opacity-0 pointer-events-none p-0 min-h-0"
+    }`;
 
   return (
     <div className="min-h-screen flex flex-col font-sans relative bg-white text-black" style={{ fontFamily: "'Syne', sans-serif" }}>
@@ -69,52 +466,74 @@ export default function App() {
       {/* SPLASH SCREEN */}
       {showSplash && (
         <div
-          className={`fixed inset-0 bg-white z-50 select-none transition-opacity duration-[1000ms] ease-out ${slideSplashPanel ? "opacity-0 pointer-events-none" : "opacity-100"
-            }`}
+          className="fixed inset-0 bg-white z-50 select-none"
+          style={{
+            opacity: slideSplashPanel ? 0 : 1,
+            transform: slideSplashPanel ? "scale(0.95)" : "scale(1.0)",
+            transition: "all 2000ms ease-out",
+            pointerEvents: slideSplashPanel ? "none" : "auto",
+          }}
         >
-          {/* Centered fading/blurring quote text container */}
-          <div
-            className="absolute inset-0 flex items-center justify-center"
-            style={{ pointerEvents: "none" }}
-          >
-            <div
-              className={`text-center px-6 transition-all duration-[800ms] ease-out ${fadeSplashText ? "opacity-0 blur-[15px] translate-y-[-10px] scale-[1.05]" : "opacity-100 blur-0 translate-y-0 scale-100 animate-clarify-entrance"
-                }`}
-            >
-              <h1
-                className="text-4xl md:text-6xl font-bold tracking-tight text-[#d00504] font-serif italic"
-                style={{ fontFamily: "'Playfair Display', serif" }}
-              >
-                One Platform. <span className="text-black not-italic font-sans">Many Opportunities.</span>
-              </h1>
-            </div>
-          </div>
-
-          {/* Flying logo container */}
+          {/* Centered logo and tagline container */}
           <div
             style={{
               position: "fixed",
-              left: slideSplashPanel && logoCoords ? `${logoCoords.x}px` : "50%",
-              top: slideSplashPanel && logoCoords ? `${logoCoords.y}px` : "58%",
-              transform: slideSplashPanel && logoCoords ? "translate(0, 0) scale(1.0)" : "translate(-50%, -50%) scale(1.3)",
-              transition: "all 1200ms cubic-bezier(0.16, 1, 0.3, 1)",
+              left: "50%",
+              top: "50%",
+              transform: "translate(-50%, -50%)",
               zIndex: 60,
               pointerEvents: "none",
-              transformOrigin: "top left",
             }}
+            className="flex flex-col items-center justify-center gap-8 text-center px-6 shrink-0 w-full"
           >
-            <div className="flex items-center gap-3 shrink-0">
+            {/* Logo Icon on Top (Wrapper for sync transition-out) */}
+            <div
+              className={`transition-opacity duration-[1200ms] ease-out ${
+                fadeSplashText ? "opacity-0" : "opacity-100"
+              }`}
+            >
               <img
                 src={logoPlaceholder}
                 alt="Foodify Logo Icon"
-                className="w-12 h-12 md:w-16 md:h-16 object-cover rounded-xl"
+                className="w-16 h-16 md:w-24 md:h-24 object-cover rounded-2xl animate-[ascend_0.8s_cubic-bezier(0.16,1,0.3,1)_forwards]"
+                style={{ animationDelay: "50ms", opacity: 0 }}
               />
+            </div>
+
+            {/* Tagline Text below Logo */}
+            <div
+              className={`transition-opacity duration-[1200ms] ease-out ${
+                fadeSplashText ? "opacity-0" : "opacity-100"
+              }`}
+            >
               <h1
-                className="text-4xl md:text-5xl font-bold tracking-tight leading-none"
-                style={{ fontFamily: "'Akzidenz-Grotesk', 'Helvetica Neue', Arial, sans-serif" }}
+                className="text-4xl md:text-6xl font-bold tracking-tight text-[#d00504] font-serif italic flex flex-wrap justify-center gap-x-[0.25em]"
+                style={{ fontFamily: "'Playfair Display', serif" }}
               >
-                <span className="text-[#d00504]">foodify</span>
-                <span className="text-black">.ph</span>
+                <span
+                  className="inline-block animate-[ascend_0.8s_cubic-bezier(0.16,1,0.3,1)_forwards]"
+                  style={{ animationDelay: "150ms", opacity: 0 }}
+                >
+                  One
+                </span>
+                <span
+                  className="inline-block animate-[ascend_0.8s_cubic-bezier(0.16,1,0.3,1)_forwards]"
+                  style={{ animationDelay: "300ms", opacity: 0 }}
+                >
+                  Platform.
+                </span>
+                <span
+                  className="inline-block text-black not-italic font-sans animate-[ascend_0.8s_cubic-bezier(0.16,1,0.3,1)_forwards]"
+                  style={{ animationDelay: "450ms", opacity: 0 }}
+                >
+                  Many
+                </span>
+                <span
+                  className="inline-block text-black not-italic font-sans animate-[ascend_0.8s_cubic-bezier(0.16,1,0.3,1)_forwards]"
+                  style={{ animationDelay: "600ms", opacity: 0 }}
+                >
+                  Opportunities.
+                </span>
               </h1>
             </div>
           </div>
@@ -122,54 +541,94 @@ export default function App() {
       )}
 
       {/* HEADER WITH SMALLER PADDING, THINNER BORDER, AND COMPACT BRAND SIZES */}
-      <header className="w-full px-6 py-4 md:px-12 lg:px-24 flex flex-col md:flex-row items-center justify-between gap-4 border-b-2 border-[#d00504] bg-white animate-fade-in-down">
+      <header className={`fixed top-0 left-0 right-0 w-full px-6 py-4 md:px-12 lg:px-24 flex flex-col md:flex-row items-center justify-between gap-4 border-b-2 border-[#d00504] bg-white z-40 transition-opacity duration-500 ease-out ${slideSplashPanel ? "opacity-100" : "opacity-0 pointer-events-none"
+        }`}>
 
         {/* 1:1 Logo and Text Group */}
         <div
           ref={headerLogoRef}
           className="flex items-center gap-3 shrink-0"
-          style={{ opacity: showSplash ? 0 : 1, transition: "opacity 0.2s" }}
+          style={{ opacity: slideSplashPanel ? 1 : 0, transition: "opacity 0.3s ease-out" }}
         >
           <img
             src={logoPlaceholder}
             alt="Foodify Logo Icon"
-            className="w-12 h-12 md:w-16 md:h-16 object-cover rounded-xl"
+            className={`w-12 h-12 md:w-16 md:h-16 object-cover rounded-xl transition-all duration-[1000ms] cubic-bezier(0.34, 1.56, 0.64, 1) ${slideSplashPanel ? "scale-100 opacity-100" : "scale-0 opacity-0"
+              }`}
           />
-          <h1
-            className="text-4xl md:text-5xl font-bold tracking-tight leading-none"
-            style={{ fontFamily: "'Akzidenz-Grotesk', 'Helvetica Neue', Arial, sans-serif" }}
+          <div
+            className={`overflow-hidden transition-all duration-[1000ms] ease-out ${slideSplashPanel ? "max-w-[300px] opacity-100 translate-x-0" : "max-w-0 opacity-0 -translate-x-6"
+              }`}
           >
-            <span className="text-[#d00504]">foodify</span>
-            <span className="text-black">.ph</span>
-          </h1>
+            <h1
+              className="text-4xl md:text-5xl font-bold tracking-tight leading-none whitespace-nowrap"
+              style={{ fontFamily: "'Akzidenz-Grotesk', 'Helvetica Neue', Arial, sans-serif" }}
+            >
+              <span className="text-[#d00504]">foodify</span>
+              <span className="text-black">.ph</span>
+            </h1>
+          </div>
         </div>
 
         {/* Navigation */}
         <div className="flex flex-col md:flex-row items-center gap-4 lg:gap-8">
           <nav className="flex flex-wrap justify-center gap-4 lg:gap-6 font-semibold text-gray-800 text-sm tracking-wide uppercase">
-            <a href="#" className="hover:text-[#d00504] transition-colors">Home</a>
-            <a href="#" className="hover:text-[#d00504] transition-colors">About Us</a>
-            <a href="#" className="hover:text-[#d00504] transition-colors">Be our supplier</a>
-            <a href="#" className="hover:text-[#d00504] transition-colors">Catalogs</a>
-            <a href="#" className="hover:text-[#d00504] transition-colors">FAQs</a>
+            <a href="#" className={`hover:text-[#d00504] transition-all duration-[500ms] ease-out transform ${slideSplashPanel ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-2'
+              }`} style={{ transitionDelay: '80ms' }}>Home</a>
+            <a href="#" className={`hover:text-[#d00504] transition-all duration-[500ms] ease-out transform ${slideSplashPanel ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-2'
+              }`} style={{ transitionDelay: '160ms' }}>About Us</a>
+            <a href="#" className={`hover:text-[#d00504] transition-all duration-[500ms] ease-out transform ${slideSplashPanel ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-2'
+              }`} style={{ transitionDelay: '240ms' }}>Be our supplier</a>
+            <a href="#" className={`hover:text-[#d00504] transition-all duration-[500ms] ease-out transform ${slideSplashPanel ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-2'
+              }`} style={{ transitionDelay: '320ms' }}>FAQs</a>
           </nav>
         </div>
       </header>
 
-      <main className="flex-grow flex flex-col">
-        {/* HERO SECTION - ORIGINAL GRID LAYOUT WITH ANIMATIONS */}
-        <section className="px-6 py-16 md:px-12 lg:px-24 w-full max-w-6xl mx-auto grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-16 items-center text-left">
+      <main className="flex-grow flex flex-col pt-32 md:pt-24">
+        {/* HERO SECTION - WIDER LAYOUT TO PREVENT CRAMPING */}
+        <section className="px-6 py-16 md:px-12 lg:px-24 w-full max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-24 items-center text-left">
 
-          {/* Left Column: Text & Buttons (7/12 Width) */}
-          <div className="lg:col-span-7 flex flex-col items-start gap-6 animate-fade-in-up">
+          {/* Left Column: Text & Buttons (Now 6/12 Width) */}
+          <div className="lg:col-span-6 flex flex-col items-start gap-6 animate-fade-in-up z-10">
 
             {/* Main Headings */}
             <div className="flex flex-col gap-2 w-full">
-              <h2 className="text-5xl md:text-7xl font-bold text-[#d00504] uppercase leading-tight" style={{ fontFamily: "'Playfair Display', serif" }}>
-                ONE PLATFORM.
+              <h2 className="text-5xl md:text-7xl font-bold text-[#d00504] uppercase leading-tight py-1 flex flex-wrap gap-x-[0.25em]" style={{ fontFamily: "'Playfair Display', serif" }}>
+                {"ONE PLATFORM.".split(" ").map((word, wordIndex, wordsArray) => {
+                  const previousWords = wordsArray.slice(0, wordIndex);
+                  const charOffset = previousWords.reduce((sum, w) => sum + w.length + 1, 0);
+                  return (
+                    <span key={wordIndex} className="inline-block whitespace-nowrap">
+                      {word.split("").map((char, charIndex) => (
+                        <span
+                          key={charIndex}
+                          className="inline-block animate-[ascend_0.8s_cubic-bezier(0.16,1,0.3,1)_forwards]"
+                          style={{
+                            animationDelay: `${(charOffset + charIndex) * 45}ms`,
+                            opacity: 0
+                          }}
+                        >
+                          {char}
+                        </span>
+                      ))}
+                    </span>
+                  );
+                })}
               </h2>
-              <h3 className="text-4xl md:text-5xl text-[#d00504] italic leading-tight" style={{ fontFamily: "'Playfair Display', serif" }}>
-                Many Opportunities.
+              <h3 className="text-4xl md:text-5xl text-[#d00504] italic leading-tight py-1 flex flex-wrap gap-x-[0.25em]" style={{ fontFamily: "'Playfair Display', serif" }}>
+                {"Many Opportunities.".split(" ").map((word, index) => (
+                  <span
+                    key={index}
+                    className="inline-block animate-[burst_0.75s_cubic-bezier(0.34,1.56,0.64,1)_forwards]"
+                    style={{
+                      animationDelay: `${index * 180 + 650}ms`,
+                      opacity: 0,
+                    }}
+                  >
+                    {word}
+                  </span>
+                ))}
               </h3>
             </div>
 
@@ -195,12 +654,12 @@ export default function App() {
 
           </div>
 
-          {/* Right Column: 1:1 Showcase Image (5/12 Width) */}
-          <div className="lg:col-span-5 w-full flex justify-center lg:justify-end animate-fade-in-up delay-200">
+          {/* Right Column: Showcase Image (Now 6/12 Width) */}
+          <div className="lg:col-span-6 flex justify-center lg:justify-end animate-fade-in-up delay-200 relative">
             <img
               src={asset1}
               alt="Foodify Showcase"
-              className="w-full max-w-md aspect-square object-cover rounded-2xl"
+              className="w-[120%] lg:w-[145%] xl:w-[120%] max-w-none h-auto object-contain transform lg:translate-x-12"
             />
           </div>
 
@@ -209,23 +668,823 @@ export default function App() {
         {/* ABOUT US SECTION */}
         <section className="bg-[#d00504] text-white px-6 py-20 md:px-12 lg:px-24 w-full">
           <div className="max-w-4xl mx-auto flex flex-col gap-8 text-center md:text-left">
-            <h2 className="text-3xl md:text-4xl font-bold border-b border-white/30 pb-4 inline-block w-fit mx-auto md:mx-0">
+            <h2 className="reveal-wipe-left text-3xl md:text-4xl font-bold border-b border-white/30 pb-4 inline-block w-fit mx-auto md:mx-0">
               About Us
             </h2>
-            <p className="text-xl md:text-2xl leading-relaxed font-medium">
+            <p className="reveal-fade-up text-xl md:text-2xl leading-relaxed font-medium">
               Foodify is a food commerce platform that empowers aspiring food entrepreneurs, home-based cooks, and local businesses to sell their products online with ease. Whether you're starting without your own kitchen or expanding an existing food business, Foodify provides the tools to manage orders, payments, and deliveries in one convenient platform.
             </p>
           </div>
         </section>
 
-        {/* BRANDS / LOGOS SECTION */}
-        <section className="px-6 py-20 flex justify-center gap-8 md:gap-16 items-center flex-wrap bg-white">
-          {/* 1:1 Logo Placeholders */}
-          {[1, 2, 3].map((i) => (
-            <div key={i} className="w-24 h-24 md:w-32 md:h-32 rounded-full border-4 border-[#d00504] flex items-center justify-center text-[#d00504] hover:scale-105 transition-transform duration-300 cursor-pointer">
-              <span className="text-4xl font-bold" style={{ fontFamily: "'Playfair Display', serif" }}>€</span>
+        {/* INTERACTIVE DASHBOARD SECTION */}
+        <section className="px-6 py-20 md:px-12 lg:px-24 w-full bg-gradient-to-b from-gray-50 to-white border-t border-gray-100 overflow-hidden">
+          <div className="max-w-7xl mx-auto flex flex-col gap-12">
+
+            {/* Header Area */}
+            <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 border-b-2 border-gray-100 pb-8">
+              <div className="flex flex-col gap-3">
+                <h2 className="reveal-wipe-left text-4xl md:text-5xl font-bold text-gray-900 leading-tight uppercase font-serif" style={{ fontFamily: "'Playfair Display', serif" }}>
+                  Interactive Dashboard Walkthrough
+                </h2>
+                <p className="reveal-fade-up text-lg text-gray-600 max-w-2xl font-sans">
+                  Explore how Foodify simplifies supply chain operations, manages orders, tracks revenue, and helps resellers grow your food brand.
+                </p>
+              </div>
+
+              {/* Reset/Control Tip */}
+              <div className="text-sm font-semibold text-[#d00504] bg-[#d00504]/5 px-4 py-2 rounded-full border border-[#d00504]/10 shrink-0 w-fit font-sans">
+                💡 Select a feature tab to explore capabilities
+              </div>
             </div>
-          ))}
+
+            {/* Content Grid */}
+            <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
+
+              {/* Left Column: Full Annotated Image Diagram inside a red card container (7/12 width) */}
+              <div className="reveal-scale-in lg:col-span-7 flex items-center justify-center bg-[#d00504] p-6 md:p-10 rounded-3xl md:rounded-[2.5rem] shadow-xl select-none w-full relative">
+                <div className="relative w-full overflow-visible">
+                  <img
+                    src={dashboardImage}
+                    alt="Foodify Merchant Dashboard Diagram"
+                    className="w-full h-auto object-contain relative z-10"
+                  />
+
+                  {/* Hotspots mapped over the printed card rectangles in the diagram */}
+                  {dashboardFeatures.map((feature) => {
+                    const isActive = activeId === feature.id;
+                    return (
+                      <button
+                        key={feature.id}
+                        onClick={() => setActiveId(feature.id)}
+                        onMouseEnter={() => setActiveId(feature.id)}
+                        aria-label={`Select feature ${feature.id}`}
+                        style={{
+                          top: feature.boxPosition.top,
+                          left: feature.boxPosition.left,
+                          width: feature.boxPosition.width,
+                          height: feature.boxPosition.height,
+                        }}
+                        className={`absolute z-20 rounded-[0.55rem] md:rounded-[0.75rem] cursor-pointer focus:outline-none transition-all duration-300 flex items-center justify-center group active:scale-[0.98] ${isActive
+                          ? "bg-white/10 shadow-[0_0_20px_rgba(255,255,255,0.4)]"
+                          : "bg-transparent hover:bg-white/5"
+                          }`}
+                      >
+                        {/* Glowing white border ring around the card rectangle */}
+                        <span className={`absolute inset-0 rounded-[0.55rem] md:rounded-[0.75rem] border-2 md:border-3 transition-all duration-300 ${isActive
+                          ? "border-white scale-[1.02] shadow-[inset_0_0_10px_rgba(255,255,255,0.4)] animate-pulse"
+                          : "border-transparent group-hover:border-white/50 group-hover:scale-[1.01]"
+                          }`} />
+
+                        {/* Ping ring for active state */}
+                        {isActive && (
+                          <span className="absolute inset-0 rounded-[0.55rem] md:rounded-[0.75rem] border-2 border-white animate-ping opacity-60 pointer-events-none" style={{ animationDuration: "2s" }} />
+                        )}
+                      </button>
+                    );
+                  })}
+                </div>
+              </div>
+
+              {/* Right Column: Interactive Menu & Feature Detail Card (5/12 width) */}
+              <div className="reveal-fade-left lg:col-span-5 flex flex-col gap-6 w-full lg:sticky lg:top-24">
+
+                {/* Feature Selector Tabs */}
+                <div className="flex flex-col gap-2 bg-gray-100 p-2 rounded-2xl border border-gray-100 shadow-sm">
+                  {dashboardFeatures.map((feature) => {
+                    const isActive = activeId === feature.id;
+                    const IconComponent = feature.icon;
+                    return (
+                      <button
+                        key={feature.id}
+                        onClick={() => setActiveId(feature.id)}
+                        className={`flex items-center gap-3 px-4 py-2.5 rounded-xl font-bold text-sm text-left transition-all duration-200 cursor-pointer w-full font-sans ${isActive
+                          ? "bg-white text-[#d00504] shadow-md border-l-4 border-[#d00504]"
+                          : "text-gray-600 hover:bg-white/50 hover:text-[#d00504]"
+                          }`}
+                      >
+                        <span className={`flex items-center justify-center w-6 h-6 rounded-md shrink-0 transition-colors ${isActive ? "bg-[#d00504]/10 text-[#d00504]" : "bg-gray-200/60 text-gray-500"
+                          }`}>
+                          <IconComponent className="w-3.5 h-3.5" />
+                        </span>
+                        <span className="truncate">{feature.title}</span>
+                        <span className={`ml-auto text-[10px] font-extrabold px-1.5 py-0.5 rounded transition-colors ${isActive ? "bg-[#d00504]/10 text-[#d00504]" : "bg-gray-200 text-gray-500"
+                          }`}>
+                          #{feature.id}
+                        </span>
+                      </button>
+                    );
+                  })}
+                </div>
+
+                {/* Highlighted Feature Detail Display */}
+                {(() => {
+                  const activeFeature = dashboardFeatures.find(f => f.id === activeId) || dashboardFeatures[0];
+                  const Icon = activeFeature.icon;
+                  return (
+                    <div className="bg-white p-6 md:p-8 rounded-3xl border border-gray-100 shadow-xl flex flex-col gap-6 relative overflow-hidden transition-all duration-300 transform">
+
+                      {/* Accent highlight strip */}
+                      <div className="absolute top-0 left-0 right-0 h-2 bg-[#d00504]"></div>
+
+                      {/* Transition wrapper for smooth content changes */}
+                      <div key={activeId} className="flex flex-col gap-6 animate-[fadeIn_0.35s_ease-out_forwards]">
+                        {/* Title & Badge */}
+                        <div className="flex items-center gap-4">
+                          <div className="w-12 h-12 rounded-2xl bg-[#d00504]/10 flex items-center justify-center text-[#d00504] shrink-0 shadow-inner">
+                            <Icon className="w-6 h-6" />
+                          </div>
+                          <div className="flex flex-col text-left">
+                            <span className="text-xs font-bold text-[#d00504] uppercase tracking-wider font-sans">
+                              {activeFeature.badge}
+                            </span>
+                            <h3 className="text-2xl font-extrabold text-gray-900 font-sans tracking-tight">
+                              {activeFeature.title}
+                            </h3>
+                          </div>
+                        </div>
+
+                        {/* Description */}
+                        <p className="text-gray-600 text-base leading-relaxed text-left font-sans">
+                          {activeFeature.description}
+                        </p>
+
+                        {/* Benefits / Highlights */}
+                        <div className="flex flex-col gap-3 pt-2 text-left">
+                          <h4 className="text-xs font-extrabold tracking-wider text-gray-400 uppercase font-sans">
+                            Key Capabilities
+                          </h4>
+                          <ul className="flex flex-col gap-2.5">
+                            {activeFeature.benefits.map((benefit, index) => (
+                              <li key={index} className="flex items-start gap-3 text-sm text-gray-700 font-medium font-sans">
+                                <CheckCircle2 className="w-4 h-4 text-emerald-500 shrink-0 mt-0.5" />
+                                <span>{benefit}</span>
+                              </li>
+                            ))}
+                          </ul>
+                        </div>
+                      </div>
+
+                    </div>
+                  );
+                })()}
+              </div>
+
+            </div>
+
+          </div>
+        </section>
+
+        {/* THE FOODIFY NETWORK SECTION (NOW INTERACTIVE CHAT FAQS) */}
+        <section className="bg-gradient-to-br from-[#ffbc00] to-[#ffcd38] text-black px-4 py-12 md:px-12 lg:px-24 w-full relative overflow-hidden border-t-2 border-b-2 border-amber-400/20">
+          {/* Subtle warm decorative glowing highlights */}
+          <div className="absolute -top-12 -left-12 w-64 h-64 bg-white/20 rounded-full blur-[80px] pointer-events-none" />
+          <div className="absolute -bottom-12 -right-12 w-64 h-64 bg-[#d00504]/10 rounded-full blur-[80px] pointer-events-none animate-pulse" style={{ animationDuration: '6s' }} />
+
+          <div className="max-w-5xl mx-auto flex flex-col gap-6 relative z-10">
+
+            {/* Section Header */}
+            <div className="text-center max-w-2xl mx-auto flex flex-col gap-3">
+              <span className="text-[10px] md:text-xs font-black tracking-widest text-[#d00504] bg-[#d00504]/10 border border-[#d00504]/20 px-3 py-1 rounded-full w-fit mx-auto uppercase">
+                Support Center
+              </span>
+              <h2 className="reveal-wipe-left text-3xl md:text-4xl font-black uppercase tracking-tight text-gray-900" style={{ fontFamily: "'Playfair Display', serif" }}>
+                Interactive Support Chat
+              </h2>
+              <p className="reveal-fade-up text-sm font-bold text-gray-800/80" style={{ transitionDelay: "200ms" }}>
+                Have questions? Choose a category on the left, type keywords to search, or ask the Foodify Assistant.
+              </p>
+            </div>
+
+            {/* Main Console Container */}
+            <div className="reveal-scale-in grid grid-cols-1 lg:grid-cols-12 gap-6 bg-white text-gray-900 rounded-3xl p-5 md:p-6 shadow-2xl border border-amber-200/50 w-full overflow-hidden" style={{ transitionDelay: "400ms" }}>
+
+              {/* Left Column: Selector Panel (lg:col-span-5) */}
+              <div className="lg:col-span-5 flex flex-col gap-4 h-full justify-between min-h-[420px]">
+
+                {/* Search Input Box */}
+                <div className="flex flex-col gap-1.5 text-left">
+                  <span className="text-[10px] font-extrabold text-gray-400 uppercase tracking-widest px-1">Search Help Center</span>
+                  <div className="relative flex items-center">
+                    <Search className="absolute left-3.5 w-4 h-4 text-gray-400" />
+                    <input
+                      type="text"
+                      placeholder="Type keywords (e.g. payout, reseller...)"
+                      value={searchQuery}
+                      onChange={(e) => setSearchQuery(e.target.value)}
+                      className="w-full text-xs font-bold bg-gray-50 text-gray-800 placeholder-gray-450 border border-gray-200 focus:border-[#d00504] focus:ring-1 focus:ring-[#d00504]/20 rounded-xl py-2.5 pl-10 pr-9 transition-all duration-200 outline-none shadow-inner"
+                    />
+                    {searchQuery && (
+                      <button
+                        onClick={() => setSearchQuery("")}
+                        className="absolute right-2.5 p-1 rounded-md text-gray-400 hover:text-[#d00504] hover:bg-gray-150 transition-colors cursor-pointer text-[10px] font-bold"
+                      >
+                        ✕
+                      </button>
+                    )}
+                  </div>
+                </div>
+
+                {/* Search Results vs Category Views */}
+                {searchQuery.trim() ? (
+                  /* Search Results View */
+                  <div className="flex flex-col gap-1.5 flex-grow text-left">
+                    <div className="flex justify-between items-center px-1">
+                      <span className="text-[10px] font-extrabold text-gray-400 uppercase tracking-widest">
+                        Search Results ({searchResults.length})
+                      </span>
+                      <button
+                        onClick={() => setSearchQuery("")}
+                        className="text-[9px] font-extrabold text-[#d00504] hover:underline cursor-pointer"
+                      >
+                        Clear Search
+                      </button>
+                    </div>
+                    <div className="flex flex-col gap-1.5 max-h-[220px] overflow-y-auto pr-1 bg-gray-50/80 p-2 rounded-xl border border-gray-100 shadow-inner scrollbar-thin">
+                      {searchResults.length > 0 ? (
+                        searchResults.map((faq, idx) => (
+                          <button
+                            key={idx}
+                            onClick={() => handleQuestionClick(faq.q, faq.a)}
+                            className="w-full text-left px-3 py-2.5 rounded-xl text-xs font-bold bg-white hover:bg-gray-50 text-gray-800 hover:text-[#d00504] border border-gray-150 hover:border-gray-200 transition-all duration-200 cursor-pointer shadow-sm active:scale-[0.98] group flex flex-col gap-1.5"
+                          >
+                            <span className="group-hover:translate-x-0.5 transition-transform duration-200 text-left leading-snug">{faq.q}</span>
+                            <span className="text-[8px] font-black tracking-widest text-[#d00504] uppercase bg-[#d00504]/5 border border-[#d00504]/10 px-2 py-0.5 rounded w-fit">
+                              {faq.categoryTitle}
+                            </span>
+                          </button>
+                        ))
+                      ) : (
+                        <div className="flex flex-col items-center justify-center py-8 px-4 text-center gap-2">
+                          <span className="text-2xl">🔍</span>
+                          <p className="text-xs font-bold text-slate-400">No matching questions found.</p>
+                          <p className="text-[10px] text-slate-500">Try searching other keywords like "wallet", "rider" or "payout".</p>
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                ) : (
+                  /* Standard Categories & FAQ View */
+                  <>
+                    {/* Category Tabs */}
+                    <div className="flex flex-col gap-1.5 text-left">
+                      <span className="text-[10px] font-extrabold text-gray-400 uppercase tracking-widest px-1">Select Category</span>
+                      <div className="flex flex-col gap-1 bg-gray-100 p-1.5 rounded-xl border border-gray-200/80 shadow-inner">
+                        {faqCategories.map((cat) => {
+                          const isActive = activeCategory === cat.id;
+                          const Icon = cat.icon;
+                          const count = faqData[cat.id]?.length || 0;
+                          return (
+                            <button
+                              key={cat.id}
+                              onClick={() => setActiveCategory(cat.id)}
+                              className={`flex items-center gap-2.5 px-3 py-2 rounded-lg font-bold text-xs text-left transition-all duration-200 cursor-pointer w-full ${isActive
+                                ? "bg-white text-[#d00504] shadow-sm border-l-4 border-[#d00504]"
+                                : "text-gray-600 hover:bg-white/50 hover:text-[#d00504]"
+                                }`}
+                            >
+                              <Icon className={`w-3.5 h-3.5 ${isActive ? "text-[#d00504]" : "text-gray-400"}`} />
+                              <span className="truncate flex-grow">{cat.title}</span>
+                              <span className={`text-[9px] font-extrabold px-1.5 rounded ${isActive ? "bg-[#d00504]/10 text-[#d00504]" : "bg-gray-200 text-gray-450"}`}>
+                                {count}
+                              </span>
+                            </button>
+                          );
+                        })}
+                      </div>
+                    </div>
+
+                    {/* Question Selector List */}
+                    <div className="flex flex-col gap-1.5 flex-grow text-left">
+                      <span className="text-[10px] font-extrabold text-gray-400 uppercase tracking-widest px-1">Select Question</span>
+                      <div className="flex flex-col gap-1.5 max-h-[140px] overflow-y-auto pr-1 bg-gray-50/80 p-1.5 rounded-xl border border-gray-100 shadow-inner scrollbar-thin">
+                        {faqData[activeCategory].map((faq, idx) => (
+                          <button
+                            key={idx}
+                            onClick={() => handleQuestionClick(faq.q, faq.a)}
+                            className="w-full text-left px-3 py-2 rounded-lg text-xs font-bold bg-white hover:bg-gray-50 text-gray-800 hover:text-[#d00504] border border-gray-100 hover:border-gray-200 transition-all duration-200 cursor-pointer shadow-sm active:scale-[0.98] group"
+                          >
+                            <span className="block group-hover:translate-x-0.5 transition-transform duration-200 leading-snug">{faq.q}</span>
+                          </button>
+                        ))}
+                      </div>
+                    </div>
+                  </>
+                )}
+
+                {/* User Status Card */}
+                <div className="bg-gray-50 border border-gray-100 p-3 rounded-xl flex items-center justify-between shadow-inner">
+                  <div className="flex flex-col text-left">
+                    <span className="text-[9px] font-bold text-gray-400 uppercase tracking-widest">Platform Support</span>
+                    <span className="text-xs font-bold text-gray-700">Live Agent Console</span>
+                  </div>
+                  <div className="flex items-center gap-1.5 bg-emerald-500/10 text-emerald-600 px-2.5 py-1 rounded-full text-[10px] font-bold border border-emerald-500/20 relative">
+                    <span className="relative flex h-2 w-2">
+                      <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+                      <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
+                    </span>
+                    ONLINE
+                  </div>
+                </div>
+
+              </div>
+
+              {/* Right Column: Chat Console (lg:col-span-7) */}
+              <div className="lg:col-span-7 flex flex-col bg-gray-50 rounded-2xl border border-gray-200/60 p-4 h-[420px] justify-between overflow-hidden relative shadow-inner">
+
+                {/* Console Header */}
+                <div className="flex items-center justify-between border-b border-gray-200 pb-3 mb-3 shrink-0">
+                  <div className="flex items-center gap-2.5">
+                    <div className="relative">
+                      <div className="w-8 h-8 rounded-lg bg-[#d00504] flex items-center justify-center text-white shadow-md">
+                        <Bot className="w-4.5 h-4.5 text-white" />
+                      </div>
+                      <span className="absolute bottom-0 right-0 w-2.5 h-2.5 bg-emerald-500 border-2 border-white rounded-full animate-pulse" />
+                    </div>
+                    <div className="flex flex-col text-left">
+                      <div className="flex items-center gap-1.5">
+                        <span className="text-xs font-black tracking-tight text-gray-900 font-sans">Foodify Assistant</span>
+                        <span className="text-[9px] font-extrabold text-[#d00504] bg-[#d00504]/5 border border-[#d00504]/10 px-1.5 py-0.25 rounded-md">BOT</span>
+                      </div>
+                      <span className="text-[9px] font-bold text-gray-400">Replies instantly</span>
+                    </div>
+                  </div>
+                  <button
+                    onClick={clearChat}
+                    disabled={chatMessages.length === 0}
+                    className="text-[10px] font-bold text-gray-500 hover:text-[#d00504] px-2.5 py-1.5 rounded-md hover:bg-[#d00504]/5 border border-transparent hover:border-[#d00504]/10 transition-all duration-200 cursor-pointer disabled:opacity-40 disabled:pointer-events-none bg-white shadow-sm flex items-center gap-1 text-center justify-center"
+                  >
+                    <Trash2 className="w-3.5 h-3.5" />
+                    CLEAR
+                  </button>
+                </div>
+
+                {/* Message Log */}
+                <div className="flex-grow overflow-y-auto flex flex-col gap-3.5 pr-1 scrollbar-thin scrollbar-track-transparent scroll-smooth" id="chat-box">
+                  {/* System Greeting */}
+                  <div className="flex flex-col gap-1 max-w-[85%] self-start text-left items-start animate-fade-in-up">
+                    <span className="text-[8px] font-bold text-gray-400">Foodify Assistant</span>
+                    <div className="bg-white text-gray-750 px-3.5 py-2.5 rounded-2xl rounded-tl-none border border-gray-200 shadow-sm text-xs font-semibold leading-relaxed">
+                      Hi there! I'm Foodify's assistant. Click on any question on the left and I'll tell you more about our platform, onboarding process, reseller commissions, and features!
+                    </div>
+                    <span className="text-[8px] font-bold text-gray-400 px-1">04:32 PM</span>
+                  </div>
+
+                  {chatMessages.map((msg, idx) => {
+                    const isUser = msg.sender === 'user';
+                    return (
+                      <div
+                        key={idx}
+                        className={`flex flex-col gap-1 max-w-[85%] ${isUser ? "self-end items-end animate-fade-in" : "self-start items-start text-left animate-fade-in-up"
+                          }`}
+                      >
+                        <span className="text-[8px] font-bold text-gray-400 font-sans">
+                          {isUser ? "You" : "Foodify Assistant"}
+                        </span>
+                        <div className={`px-3.5 py-2.5 rounded-2xl text-xs font-semibold leading-relaxed border ${isUser
+                          ? "bg-white text-gray-800 rounded-tr-none border-gray-200 shadow-sm"
+                          : "bg-[#d00504] text-white rounded-tl-none border-[#d00504]/20 shadow-md shadow-[#d00504]/10"
+                          }`}>
+                          {isUser ? msg.text : formatMessageText(msg.text)}
+                        </div>
+
+                        {/* Feedback ratings */}
+                        {!isUser && (
+                          <div className="flex items-center gap-2 mt-0.5 px-1 bg-white/10 rounded-md py-0.5">
+                            <span className="text-[9px] font-bold text-gray-400">Was this helpful?</span>
+                            <button
+                              onClick={() => handleFeedback(idx, 'up')}
+                              disabled={msg.rating !== undefined}
+                              className={`p-1 rounded hover:bg-gray-200/60 transition-colors text-gray-400 cursor-pointer ${msg.rating === 'up' ? 'text-emerald-600 bg-emerald-500/10' : 'hover:text-emerald-500'}`}
+                            >
+                              <ThumbsUp className="w-3.5 h-3.5" />
+                            </button>
+                            <button
+                              onClick={() => handleFeedback(idx, 'down')}
+                              disabled={msg.rating !== undefined}
+                              className={`p-1 rounded hover:bg-gray-200/60 transition-colors text-gray-400 cursor-pointer ${msg.rating === 'down' ? 'text-[#d00504] bg-[#d00504]/5' : 'hover:text-[#d00504]'}`}
+                            >
+                              <ThumbsDown className="w-3.5 h-3.5" />
+                            </button>
+                            {msg.rating && (
+                              <span className="text-[9px] font-black text-[#d00504] animate-pulse ml-1 animate-fade-in">
+                                Thank you!
+                              </span>
+                            )}
+                          </div>
+                        )}
+
+                        <span className="text-[8px] font-bold text-gray-400 px-1">{msg.timestamp}</span>
+                      </div>
+                    );
+                  })}
+
+                  {/* Typing Indicator */}
+                  {isTyping && (
+                    <div className="flex flex-col gap-1 items-start max-w-[70px] self-start animate-fade-in">
+                      <span className="text-[8px] font-bold text-gray-400">Typing...</span>
+                      <div className="flex items-center gap-1 bg-white border border-gray-200 px-3 py-2 rounded-xl rounded-tl-none shadow-sm">
+                        <span className="w-1.5 h-1.5 rounded-full bg-[#ffbc00] animate-bounce" style={{ animationDelay: '0ms' }}></span>
+                        <span className="w-1.5 h-1.5 rounded-full bg-[#d00504] animate-bounce" style={{ animationDelay: '150ms' }}></span>
+                        <span className="w-1.5 h-1.5 rounded-full bg-gray-400 animate-bounce" style={{ animationDelay: '300ms' }}></span>
+                      </div>
+                    </div>
+                  )}
+                </div>
+
+                {/* Quick Links / Action Footer */}
+                <div className="border-t border-gray-200 pt-3 mt-3 flex items-center justify-between flex-wrap gap-2 shrink-0">
+                  <span className="text-[9px] font-bold text-gray-400 uppercase tracking-widest text-left">Quick Actions</span>
+                  <div className="flex gap-1.5">
+                    <a
+                      href="mailto:support@foodify.com"
+                      className="bg-white hover:bg-gray-50 text-gray-700 hover:text-[#d00504] px-2.5 py-1.5 rounded-lg text-[10px] font-bold border border-gray-200 hover:border-gray-300 transition-all flex items-center gap-1.5 shadow-sm animate-pulse-subtle"
+                    >
+                      <Mail className="w-3.5 h-3.5 text-gray-450" />
+                      EMAIL SUPPORT
+                    </a>
+                    <button
+                      onClick={() => {
+                        setSearchQuery("");
+                        setActiveCategory("merchant");
+                      }}
+                      className="bg-white hover:bg-gray-50 text-gray-700 hover:text-[#d00504] px-2.5 py-1.5 rounded-lg text-[10px] font-bold border border-gray-200 hover:border-gray-300 transition-all flex items-center gap-1.5 cursor-pointer shadow-sm"
+                    >
+                      <Store className="w-3.5 h-3.5 text-gray-450" />
+                      MERCHANT FAQS
+                    </button>
+                  </div>
+                </div>
+
+              </div>
+
+            </div>
+
+          </div>
+        </section>
+
+        {/* DUAL WIPE ONBOARDING FORMS SECTION */}
+        <section id="onboarding-section" className="w-full flex flex-col lg:flex-row min-h-[480px] overflow-hidden border-t-4 border-b-4 border-white bg-white select-none relative">
+
+          {/* LEFT PANEL: MERCHANT ONBOARDING */}
+          <div
+            onClick={() => activeForm === 'split' && setActiveForm('merchant')}
+            className={leftClasses}
+            style={{
+              backgroundImage: activeForm !== 'reseller' ? `url(${redAsset})` : undefined,
+              backgroundSize: activeForm !== 'reseller' ? "cover" : undefined,
+              backgroundPosition: activeForm !== 'reseller' ? "center" : undefined,
+              transform: prefersReducedMotion
+                ? "none"
+                : activeForm !== "split"
+                  ? "none"
+                  : onboardingVisible
+                    ? "translateX(0)"
+                    : "translateX(-100%)",
+              transition: prefersReducedMotion
+                ? "none"
+                : activeForm !== "split"
+                  ? "flex 800ms cubic-bezier(0.16, 1, 0.3, 1)"
+                  : "transform 800ms cubic-bezier(0.25, 1, 0.5, 1), flex 800ms cubic-bezier(0.16, 1, 0.3, 1)",
+            }}
+          >
+            {activeForm === 'split' && (
+              <div className="flex flex-col items-center text-center max-w-sm transition-all duration-300 transform group-hover:scale-105">
+                <Store
+                  className={`w-16 h-16 mb-4 text-white transition-transform duration-300 group-hover:rotate-6 transition-opacity duration-[500ms] ease-out ${onboardingVisible ? "opacity-100" : "opacity-0"
+                    }`}
+                  style={{ transitionDelay: onboardingVisible ? "800ms" : "0ms" }}
+                />
+                <h3
+                  className={`text-3xl font-black uppercase tracking-wider mb-2 transition-opacity duration-[500ms] ease-out ${onboardingVisible ? "opacity-100" : "opacity-0"
+                    }`}
+                  style={{ transitionDelay: onboardingVisible ? "900ms" : "0ms", fontFamily: "'Playfair Display', serif" }}
+                >
+                  Become a Supplier
+                </h3>
+                <p
+                  className={`text-sm font-medium opacity-90 mb-6 font-sans transition-opacity duration-[500ms] ease-out ${onboardingVisible ? "opacity-100" : "opacity-0"
+                    }`}
+                  style={{ transitionDelay: onboardingVisible ? "1050ms" : "0ms" }}
+                >
+                  List your food menu items and let thousands of resellers pitch and market them daily.
+                </p>
+                <button
+                  className={`px-8 py-3 rounded-full border-2 border-white font-extrabold uppercase tracking-widest text-xs transition-all duration-300 bg-transparent text-white group-hover:bg-white group-hover:text-[#d00504] shadow-sm cursor-pointer transition-opacity duration-[500ms] ease-out ${onboardingVisible ? "opacity-100" : "opacity-0"
+                    }`}
+                  style={{ transitionDelay: onboardingVisible ? "1200ms" : "0ms" }}
+                >
+                  Register Kitchen
+                </button>
+              </div>
+            )}
+
+            {activeForm === 'merchant' && (
+              <div className="w-full max-w-3xl mx-auto flex flex-col gap-6 py-8 px-4 text-left select-text" onClick={(e) => e.stopPropagation()}>
+                {/* Back Button */}
+                <button
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    resetForms();
+                  }}
+                  className="flex items-center gap-2 text-xs font-black hover:underline self-start uppercase tracking-widest mb-4 cursor-pointer text-yellow-400 hover:text-yellow-300"
+                >
+                  ← Back to options
+                </button>
+
+                {!merchantSubmitted && (
+                  <form onSubmit={handleMerchantSubmit} className="flex flex-col gap-6 w-full animate-[fadeIn_0.5s_ease-out_forwards]">
+                    <div>
+                      <h3 className="text-3.5xl font-black uppercase tracking-tight" style={{ fontFamily: "'Playfair Display', serif" }}>Merchant Application</h3>
+                      <p className="text-sm font-semibold text-white/80 mt-1 font-sans">Submit your details and get listed on our reseller catalogue within 48 hours.</p>
+                    </div>
+
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4 font-sans">
+                      <div className="flex flex-col gap-1.5">
+                        <label className="text-xs font-black uppercase tracking-wider">Kitchen / Business Name</label>
+                        <input
+                          type="text"
+                          required
+                          value={merchantData.businessName}
+                          onChange={(e) => setMerchantData({ ...merchantData, businessName: e.target.value })}
+                          placeholder="e.g. Grandma's Kitchen"
+                          className="bg-white/15 border border-white/20 rounded-xl px-4 py-3 text-sm font-bold text-white placeholder-white/30 focus:border-white focus:outline-none focus:bg-white/20 transition-all shadow-inner"
+                        />
+                      </div>
+
+                      <div className="flex flex-col gap-1.5">
+                        <label className="text-xs font-black uppercase tracking-wider">Contact Person Name</label>
+                        <input
+                          type="text"
+                          required
+                          value={merchantData.contactName}
+                          onChange={(e) => setMerchantData({ ...merchantData, contactName: e.target.value })}
+                          placeholder="e.g. Jane Doe"
+                          className="bg-white/15 border border-white/20 rounded-xl px-4 py-3 text-sm font-bold text-white placeholder-white/30 focus:border-white focus:outline-none focus:bg-white/20 transition-all shadow-inner"
+                        />
+                      </div>
+
+                      <div className="flex flex-col gap-1.5">
+                        <label className="text-xs font-black uppercase tracking-wider">Phone / Mobile Number</label>
+                        <input
+                          type="tel"
+                          required
+                          value={merchantData.phone}
+                          onChange={(e) => setMerchantData({ ...merchantData, phone: e.target.value })}
+                          placeholder="e.g. 09171234567"
+                          className="bg-white/15 border border-white/20 rounded-xl px-4 py-3 text-sm font-bold text-white placeholder-white/30 focus:border-white focus:outline-none focus:bg-white/20 transition-all shadow-inner"
+                        />
+                      </div>
+
+                      <div className="flex flex-col gap-1.5">
+                        <label className="text-xs font-black uppercase tracking-wider">Food Category</label>
+                        <select
+                          value={merchantData.category}
+                          onChange={(e) => setMerchantData({ ...merchantData, category: e.target.value })}
+                          className="bg-white/15 border border-white/20 rounded-xl px-4 py-3 text-sm font-bold text-white focus:border-white focus:outline-none focus:bg-white/20 transition-all shadow-inner cursor-pointer [&>option]:text-black [&>option]:font-bold"
+                        >
+                          <option value="Home Kitchen">Home Kitchen Cook</option>
+                          <option value="Restaurant">Restaurant / Cafe</option>
+                          <option value="Bakery">Bakery & Pastries</option>
+                          <option value="Beverage">Drinks & Beverages</option>
+                          <option value="Dessert">Sweets & Desserts</option>
+                        </select>
+                      </div>
+
+                      <div className="flex flex-col gap-1.5 md:col-span-2">
+                        <label className="text-xs font-black uppercase tracking-wider">Address / Kitchen Location</label>
+                        <input
+                          type="text"
+                          required
+                          value={merchantData.address}
+                          onChange={(e) => setMerchantData({ ...merchantData, address: e.target.value })}
+                          placeholder="Unit, Street, Barangay, City"
+                          className="bg-white/15 border border-white/20 rounded-xl px-4 py-3 text-sm font-bold text-white placeholder-white/30 focus:border-white focus:outline-none focus:bg-white/20 transition-all shadow-inner"
+                        />
+                      </div>
+
+                      <div className="flex flex-col gap-1.5 md:col-span-2">
+                        <label className="text-xs font-black uppercase tracking-wider">Barangay Permit / Business ID</label>
+                        <input
+                          type="text"
+                          required
+                          value={merchantData.permitId}
+                          onChange={(e) => setMerchantData({ ...merchantData, permitId: e.target.value })}
+                          placeholder="e.g. BRGY-123456"
+                          className="bg-white/15 border border-white/20 rounded-xl px-4 py-3 text-sm font-bold text-white placeholder-white/30 focus:border-white focus:outline-none focus:bg-white/20 transition-all shadow-inner"
+                        />
+                      </div>
+                    </div>
+
+                    <button
+                      type="submit"
+                      className="bg-white text-[#d00504] py-4 rounded-full font-black uppercase tracking-widest hover:bg-[#ffbc00] hover:text-black transition-colors duration-300 text-xs mt-2 shadow-md cursor-pointer text-center"
+                    >
+                      Submit Registration
+                    </button>
+                  </form>
+                )}
+
+                {merchantSubmitted && (
+                  <div className="flex flex-col items-center text-center gap-4 py-12 animate-[fadeIn_0.5s_ease-out_forwards]">
+                    <span className="text-6xl animate-bounce">🎉</span>
+                    <h3 className="text-3.5xl font-black uppercase" style={{ fontFamily: "'Playfair Display', serif" }}>Application Sent!</h3>
+                    <p className="text-sm font-semibold opacity-90 max-w-lg font-sans leading-relaxed">
+                      Thank you, <strong>{merchantData.contactName}</strong>! We've registered <strong>{merchantData.businessName}</strong>. Our onboarding manager will verify your Barangay Permit (<strong>{merchantData.permitId}</strong>) and contact you at <strong>{merchantData.phone}</strong> in 48 hours.
+                    </p>
+                    <button
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        resetForms();
+                      }}
+                      className="mt-6 px-10 py-3.5 bg-white text-[#d00504] font-black rounded-full uppercase tracking-wider text-xs hover:bg-[#ffbc00] hover:text-black transition-colors cursor-pointer shadow-md"
+                    >
+                      Return Home
+                    </button>
+                  </div>
+                )}
+              </div>
+            )}
+          </div>
+
+          {/* RIGHT PANEL: RESELLER ONBOARDING */}
+          <div
+            onClick={() => activeForm === 'split' && setActiveForm('reseller')}
+            className={rightClasses}
+            style={{
+              backgroundImage: activeForm !== 'merchant' ? `url(${yellowAsset})` : undefined,
+              backgroundSize: activeForm !== 'merchant' ? "cover" : undefined,
+              backgroundPosition: activeForm !== 'merchant' ? "center" : undefined,
+              transform: prefersReducedMotion
+                ? "none"
+                : activeForm !== "split"
+                  ? "none"
+                  : onboardingVisible
+                    ? "translateX(0)"
+                    : "translateX(100%)",
+              transition: prefersReducedMotion
+                ? "none"
+                : activeForm !== "split"
+                  ? "flex 800ms cubic-bezier(0.16, 1, 0.3, 1)"
+                  : "transform 800ms cubic-bezier(0.25, 1, 0.5, 1), flex 800ms cubic-bezier(0.16, 1, 0.3, 1)",
+            }}
+          >
+            {activeForm === 'split' && (
+              <div className="flex flex-col items-center text-center max-w-sm transition-all duration-300 transform group-hover:scale-105">
+                <Users
+                  className={`w-16 h-16 mb-4 text-black transition-transform duration-300 group-hover:-rotate-6 transition-opacity duration-[500ms] ease-out ${onboardingVisible ? "opacity-100" : "opacity-0"
+                    }`}
+                  style={{ transitionDelay: onboardingVisible ? "800ms" : "0ms" }}
+                />
+                <h3
+                  className={`text-3xl font-black uppercase tracking-wider mb-2 text-black transition-opacity duration-[500ms] ease-out ${onboardingVisible ? "opacity-100" : "opacity-0"
+                    }`}
+                  style={{ transitionDelay: onboardingVisible ? "900ms" : "0ms", fontFamily: "'Playfair Display', serif" }}
+                >
+                  Become a Reseller
+                </h3>
+                <p
+                  className={`text-sm font-medium text-black/90 mb-6 font-sans transition-opacity duration-[500ms] ease-out ${onboardingVisible ? "opacity-100" : "opacity-0"
+                    }`}
+                  style={{ transitionDelay: onboardingVisible ? "1050ms" : "0ms" }}
+                >
+                  Start earning online commissions from local food items with 100% free signup.
+                </p>
+                <button
+                  className={`px-8 py-3 rounded-full border-2 border-black font-extrabold uppercase tracking-widest text-xs transition-all duration-300 bg-transparent text-black group-hover:bg-black group-hover:text-[#ffbc00] shadow-sm cursor-pointer transition-opacity duration-[500ms] ease-out ${onboardingVisible ? "opacity-100" : "opacity-0"
+                    }`}
+                  style={{ transitionDelay: onboardingVisible ? "1200ms" : "0ms" }}
+                >
+                  Sign Up Free
+                </button>
+              </div>
+            )}
+
+            {activeForm === 'reseller' && (
+              <div className="w-full max-w-3xl mx-auto flex flex-col gap-6 py-8 px-4 text-left select-text" onClick={(e) => e.stopPropagation()}>
+                {/* Back Button */}
+                <button
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    resetForms();
+                  }}
+                  className="flex items-center gap-2 text-xs font-black hover:underline self-start uppercase tracking-widest mb-4 cursor-pointer text-red-600 hover:text-red-800"
+                >
+                  ← Back to options
+                </button>
+
+                {!resellerSubmitted && (
+                  <form onSubmit={handleResellerSubmit} className="flex flex-col gap-6 w-full animate-[fadeIn_0.5s_ease-out_forwards] text-black">
+                    <div>
+                      <h3 className="text-3.5xl font-black uppercase tracking-tight text-black" style={{ fontFamily: "'Playfair Display', serif" }}>Reseller Sign Up</h3>
+                      <p className="text-sm font-semibold text-black/80 mt-1 font-sans">Get free access to our merchant menu catalog and start selling instantly.</p>
+                    </div>
+
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4 font-sans">
+                      <div className="flex flex-col gap-1.5">
+                        <label className="text-xs font-black uppercase tracking-wider text-black">Full Name</label>
+                        <input
+                          type="text"
+                          required
+                          value={resellerData.fullName}
+                          onChange={(e) => setResellerData({ ...resellerData, fullName: e.target.value })}
+                          placeholder="e.g. John Doe"
+                          className="bg-black/5 border border-black/20 rounded-xl px-4 py-3 text-sm font-bold text-black placeholder-black/40 focus:border-black focus:outline-none focus:bg-black/10 transition-all shadow-inner"
+                        />
+                      </div>
+
+                      <div className="flex flex-col gap-1.5">
+                        <label className="text-xs font-black uppercase tracking-wider text-black">Email Address</label>
+                        <input
+                          type="email"
+                          required
+                          value={resellerData.email}
+                          onChange={(e) => setResellerData({ ...resellerData, email: e.target.value })}
+                          placeholder="e.g. john@example.com"
+                          className="bg-black/5 border border-black/20 rounded-xl px-4 py-3 text-sm font-bold text-black placeholder-black/40 focus:border-black focus:outline-none focus:bg-black/10 transition-all shadow-inner"
+                        />
+                      </div>
+
+                      <div className="flex flex-col gap-1.5">
+                        <label className="text-xs font-black uppercase tracking-wider text-black">Mobile Number</label>
+                        <input
+                          type="tel"
+                          required
+                          value={resellerData.phone}
+                          onChange={(e) => setResellerData({ ...resellerData, phone: e.target.value })}
+                          placeholder="e.g. 09171234567"
+                          className="bg-black/5 border border-black/20 rounded-xl px-4 py-3 text-sm font-bold text-black placeholder-black/40 focus:border-black focus:outline-none focus:bg-black/10 transition-all shadow-inner"
+                        />
+                      </div>
+
+                      <div className="flex flex-col gap-1.5">
+                        <label className="text-xs font-black uppercase tracking-wider text-black">Social Media Link (FB/IG)</label>
+                        <input
+                          type="url"
+                          required
+                          value={resellerData.socialLink}
+                          onChange={(e) => setResellerData({ ...resellerData, socialLink: e.target.value })}
+                          placeholder="Facebook profile url"
+                          className="bg-black/5 border border-black/20 rounded-xl px-4 py-3 text-sm font-bold text-black placeholder-black/40 focus:border-black focus:outline-none focus:bg-black/10 transition-all shadow-inner"
+                        />
+                      </div>
+
+                      <div className="flex flex-col gap-1.5">
+                        <label className="text-xs font-black uppercase tracking-wider text-black">Preferred Cashout Channel</label>
+                        <select
+                          value={resellerData.cashoutMethod}
+                          onChange={(e) => setResellerData({ ...resellerData, cashoutMethod: e.target.value })}
+                          className="bg-black/5 border border-black/20 rounded-xl px-4 py-3 text-sm font-bold text-black focus:border-black focus:outline-none focus:bg-black/10 transition-all shadow-inner cursor-pointer font-bold"
+                        >
+                          <option value="GCash">GCash</option>
+                          <option value="Maya">Maya Wallet</option>
+                          <option value="Bank">Bank Transfer</option>
+                        </select>
+                      </div>
+
+                      <div className="flex flex-col gap-1.5">
+                        <label className="text-xs font-black uppercase tracking-wider text-black">Cashout Wallet Mobile Number</label>
+                        <input
+                          type="text"
+                          required
+                          value={resellerData.accountNumber}
+                          onChange={(e) => setResellerData({ ...resellerData, accountNumber: e.target.value })}
+                          placeholder="e.g. 09171234567"
+                          className="bg-black/5 border border-black/20 rounded-xl px-4 py-3 text-sm font-bold text-black placeholder-black/40 focus:border-black focus:outline-none focus:bg-black/10 transition-all shadow-inner"
+                        />
+                      </div>
+                    </div>
+
+                    <button
+                      type="submit"
+                      className="bg-black text-[#ffbc00] py-4 rounded-full font-black uppercase tracking-widest hover:bg-white hover:text-black border-2 border-black transition-colors duration-300 text-xs mt-2 shadow-md cursor-pointer text-center"
+                    >
+                      Start Reselling
+                    </button>
+                  </form>
+                )}
+
+                {resellerSubmitted && (
+                  <div className="flex flex-col items-center text-center gap-4 py-12 animate-[fadeIn_0.5s_ease-out_forwards]">
+                    <span className="text-6xl animate-bounce">🚀</span>
+                    <h3 className="text-3.5xl font-black uppercase text-black" style={{ fontFamily: "'Playfair Display', serif" }}>Account Created!</h3>
+                    <p className="text-sm font-semibold text-black/90 max-w-lg font-sans leading-relaxed">
+                      Welcome, <strong>{resellerData.fullName}</strong>! We've set up your reseller panel with GCash wallet <strong>{resellerData.accountNumber}</strong>. Check <strong>{resellerData.email}</strong> for your temporary passcode and training catalogs.
+                    </p>
+                    <button
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        resetForms();
+                      }}
+                      className="mt-6 px-10 py-3.5 bg-black text-[#ffbc00] font-black border-2 border-black rounded-full uppercase tracking-wider text-xs hover:bg-white hover:text-black transition-colors cursor-pointer shadow-md"
+                    >
+                      Return Home
+                    </button>
+                  </div>
+                )}
+              </div>
+            )}
+          </div>
         </section>
 
       </main>
@@ -236,14 +1495,14 @@ export default function App() {
         <div className="max-w-6xl mx-auto px-6 py-10 md:px-12 flex flex-col md:flex-row justify-end items-center gap-8 md:gap-12">
 
           {/* Contact Us Title */}
-          <div className="text-4xl md:text-[2.5rem] font-bold leading-[1.1] text-center md:text-right">
+          <div className="reveal-wipe-left text-4xl md:text-[2.5rem] font-bold leading-[1.1] text-center md:text-right">
             Contact<br className="hidden md:inline" /> Us
           </div>
 
           {/* Contact Details */}
           <ul className="list-none p-0 m-0 flex flex-col gap-3 font-sans">
             {/* Phone */}
-            <li className="flex items-center gap-4 text-sm md:text-[0.95rem] font-bold">
+            <li className="reveal-fade-up flex items-center gap-4 text-sm md:text-[0.95rem] font-bold" style={{ transitionDelay: '100ms' }}>
               <div className="flex items-center justify-center w-8 h-8 rounded-full border-2 border-white shrink-0">
                 <Phone className="w-4 h-4 text-white fill-transparent" />
               </div>
@@ -251,7 +1510,7 @@ export default function App() {
             </li>
 
             {/* Email */}
-            <li className="flex items-center gap-4 text-sm md:text-[0.95rem] font-bold">
+            <li className="reveal-fade-up flex items-center gap-4 text-sm md:text-[0.95rem] font-bold" style={{ transitionDelay: '200ms' }}>
               <div className="flex items-center justify-center w-8 h-8 rounded-full border-2 border-white shrink-0">
                 <Mail className="w-4 h-4 text-white fill-transparent" />
               </div>
@@ -259,7 +1518,7 @@ export default function App() {
             </li>
 
             {/* Address */}
-            <li className="flex items-center gap-4 text-sm md:text-[0.95rem] font-bold">
+            <li className="reveal-fade-up flex items-center gap-4 text-sm md:text-[0.95rem] font-bold" style={{ transitionDelay: '300ms' }}>
               <div className="flex items-center justify-center w-8 h-8 rounded-full border-2 border-white shrink-0">
                 <MapPin className="w-4 h-4 text-white fill-transparent" />
               </div>
