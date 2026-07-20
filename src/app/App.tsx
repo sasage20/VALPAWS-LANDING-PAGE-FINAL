@@ -22,7 +22,14 @@ import {
   ThumbsDown,
   Trash2,
   Send,
-  Bot
+  Bot,
+  Clock,
+  Globe,
+  Calendar,
+  ChevronLeft,
+  ChevronRight,
+  ArrowLeft,
+  Check
 } from "lucide-react";
 
 // @ts-ignore
@@ -204,6 +211,119 @@ export default function App() {
   });
   const [merchantSubmitted, setMerchantSubmitted] = useState(false);
 
+  // New Booking & Scheduler States
+  const [bookingStep, setBookingStep] = useState<1 | 2 | 3 | 4>(1);
+  const [selectedDate, setSelectedDate] = useState<number | null>(null); // day number (1-31)
+  const [selectedTime, setSelectedTime] = useState<string | null>(null); // e.g. "11:00 AM"
+  const [timezone, setTimezone] = useState<string>("Asia/Manila");
+  const [timeFormat, setTimeFormat] = useState<"12h" | "24h">("12h");
+
+  // Set default month to July 2026 (6 is July in 0-indexed format)
+  const [currentMonth, setCurrentMonth] = useState<number>(6);
+  const [currentYear, setCurrentYear] = useState<number>(2026);
+
+  // Flag picker state
+  const [showFlagDropdown, setShowFlagDropdown] = useState(false);
+
+  // New Supplier form details state
+  const [supplierFormData, setSupplierFormData] = useState({
+    name: "",
+    email: "",
+    phone: "",
+    countryCode: "+63",
+    businessName: "",
+    location: "",
+    foodProducts: "",
+    acceptOnline: ""
+  });
+
+  const countries = [
+    { code: "+63", flag: "🇵🇭", name: "Philippines", placeholder: "905 123 4567" },
+    { code: "+1", flag: "🇺🇸", name: "United States", placeholder: "202 555 0143" },
+    { code: "+65", flag: "🇸🇬", name: "Singapore", placeholder: "8123 4567" },
+    { code: "+44", flag: "🇬🇧", name: "United Kingdom", placeholder: "7911 123456" },
+  ];
+
+  const currentCountry = countries.find(c => c.code === supplierFormData.countryCode) || countries[0];
+
+  const MONTH_NAMES = [
+    "January", "February", "March", "April", "May", "June",
+    "July", "August", "September", "October", "November", "December"
+  ];
+
+  const getDaysInMonth = (year: number, month: number) => {
+    const firstDay = new Date(year, month, 1).getDay();
+    const totalDays = new Date(year, month + 1, 0).getDate();
+
+    const days: (number | null)[] = [];
+    for (let i = 0; i < firstDay; i++) {
+      days.push(null);
+    }
+    for (let i = 1; i <= totalDays; i++) {
+      days.push(i);
+    }
+    while (days.length < 42) {
+      days.push(null);
+    }
+    return days;
+  };
+
+  const isDateAvailable = (year: number, month: number, day: number) => {
+    const date = new Date(year, month, day);
+    const dayOfWeek = date.getDay(); // 0 = Sun, 3 = Wed, 5 = Fri
+
+    // Available days are Wednesdays (3) and Fridays (5)
+    if (dayOfWeek !== 3 && dayOfWeek !== 5) return false;
+
+    // Only current or future dates relative to July 20, 2026
+    const minDate = new Date(2026, 6, 20); // July 20, 2026
+    return date >= minDate;
+  };
+
+  const handlePrevMonth = () => {
+    if (currentMonth === 0) {
+      setCurrentMonth(11);
+      setCurrentYear(prev => prev - 1);
+    } else {
+      setCurrentMonth(prev => prev - 1);
+    }
+    setSelectedDate(null);
+    setSelectedTime(null);
+    setBookingStep(1);
+  };
+
+  const handleNextMonth = () => {
+    if (currentMonth === 11) {
+      setCurrentMonth(0);
+      setCurrentYear(prev => prev + 1);
+    } else {
+      setCurrentMonth(prev => prev + 1);
+    }
+    setSelectedDate(null);
+    setSelectedTime(null);
+    setBookingStep(1);
+  };
+
+  const getTimeSlotRange = (time: string, format: "12h" | "24h") => {
+    if (time === "11:00 AM") {
+      return format === "12h" ? "11:00am - 12:00pm" : "11:00 - 12:00";
+    } else if (time === "03:00 PM") {
+      return format === "12h" ? "3:00pm - 4:00pm" : "15:00 - 16:00";
+    }
+    return time;
+  };
+
+  const handleSupplierBookingSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    setBookingStep(4);
+    // @ts-ignore
+    confetti({
+      particleCount: 100,
+      spread: 70,
+      origin: { y: 0.6 }
+    });
+  };
+
   // Reseller Form States
   const [resellerData, setResellerData] = useState({
     fullName: "",
@@ -241,6 +361,19 @@ export default function App() {
     setActiveForm('split');
     setMerchantSubmitted(false);
     setResellerSubmitted(false);
+    setBookingStep(1);
+    setSelectedDate(null);
+    setSelectedTime(null);
+    setSupplierFormData({
+      name: "",
+      email: "",
+      phone: "",
+      countryCode: "+63",
+      businessName: "",
+      location: "",
+      foodProducts: "",
+      acceptOnline: ""
+    });
     setMerchantData({
       businessName: "",
       contactName: "",
@@ -488,9 +621,8 @@ export default function App() {
           >
             {/* Logo Icon on Top (Wrapper for sync transition-out) */}
             <div
-              className={`transition-opacity duration-[1200ms] ease-out ${
-                fadeSplashText ? "opacity-0" : "opacity-100"
-              }`}
+              className={`transition-opacity duration-[1200ms] ease-out ${fadeSplashText ? "opacity-0" : "opacity-100"
+                }`}
             >
               <img
                 src={logoPlaceholder}
@@ -502,9 +634,8 @@ export default function App() {
 
             {/* Tagline Text below Logo */}
             <div
-              className={`transition-opacity duration-[1200ms] ease-out ${
-                fadeSplashText ? "opacity-0" : "opacity-100"
-              }`}
+              className={`transition-opacity duration-[1200ms] ease-out ${fadeSplashText ? "opacity-0" : "opacity-100"
+                }`}
             >
               <h1
                 className="text-4xl md:text-6xl font-bold tracking-tight text-[#d00504] font-serif italic flex flex-wrap justify-center gap-x-[0.25em]"
@@ -573,13 +704,13 @@ export default function App() {
         {/* Navigation */}
         <div className="flex flex-col md:flex-row items-center gap-4 lg:gap-8">
           <nav className="flex flex-wrap justify-center gap-4 lg:gap-6 font-semibold text-gray-800 text-sm tracking-wide uppercase">
-            <a href="#" className={`hover:text-[#d00504] transition-all duration-[500ms] ease-out transform ${slideSplashPanel ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-2'
+            <a href="#home" className={`hover:text-[#d00504] transition-all duration-[500ms] ease-out transform ${slideSplashPanel ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-2'
               }`} style={{ transitionDelay: '80ms' }}>Home</a>
-            <a href="#" className={`hover:text-[#d00504] transition-all duration-[500ms] ease-out transform ${slideSplashPanel ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-2'
+            <a href="#about" className={`hover:text-[#d00504] transition-all duration-[500ms] ease-out transform ${slideSplashPanel ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-2'
               }`} style={{ transitionDelay: '160ms' }}>About Us</a>
-            <a href="#" className={`hover:text-[#d00504] transition-all duration-[500ms] ease-out transform ${slideSplashPanel ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-2'
-              }`} style={{ transitionDelay: '240ms' }}>Be our supplier</a>
-            <a href="#" className={`hover:text-[#d00504] transition-all duration-[500ms] ease-out transform ${slideSplashPanel ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-2'
+            <a href="#onboarding-section" className={`hover:text-[#d00504] transition-all duration-[500ms] ease-out transform ${slideSplashPanel ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-2'
+              }`} style={{ transitionDelay: '240ms' }}>Become a Partner</a>
+            <a href="#faqs" className={`hover:text-[#d00504] transition-all duration-[500ms] ease-out transform ${slideSplashPanel ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-2'
               }`} style={{ transitionDelay: '320ms' }}>FAQs</a>
           </nav>
         </div>
@@ -587,7 +718,7 @@ export default function App() {
 
       <main className="flex-grow flex flex-col pt-32 md:pt-24">
         {/* HERO SECTION - WIDER LAYOUT TO PREVENT CRAMPING */}
-        <section className="px-6 py-16 md:px-12 lg:px-24 w-full max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-24 items-center text-left">
+        <section id="home" className="px-6 py-16 md:px-12 lg:px-24 w-full max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-24 items-center text-left">
 
           {/* Left Column: Text & Buttons (Now 6/12 Width) */}
           <div className="lg:col-span-6 flex flex-col items-start gap-6 animate-fade-in-up z-10">
@@ -644,10 +775,22 @@ export default function App() {
 
             {/* CTA Buttons */}
             <div className="mt-6 flex flex-wrap items-center justify-start gap-4 w-full" style={{ fontFamily: "'Inter', sans-serif" }}>
-              <button className="bg-[#d00504] text-white px-8 py-4 rounded-full font-bold tracking-wide transition-all border-2 border-[#d00504] hover:bg-white hover:text-[#d00504] flex items-center justify-center cursor-pointer">
+              <button
+                onClick={() => {
+                  setActiveForm('merchant');
+                  document.getElementById('onboarding-section')?.scrollIntoView({ behavior: 'smooth' });
+                }}
+                className="bg-[#d00504] text-white px-8 py-4 rounded-full font-bold tracking-wide transition-all border-2 border-[#d00504] hover:bg-white hover:text-[#d00504] flex items-center justify-center cursor-pointer"
+              >
                 BOOK A FREE DEMO
               </button>
-              <button className="bg-white text-[#d00504] px-8 py-4 rounded-full font-bold tracking-wide transition-all border-2 border-[#d00504] hover:bg-[#d00504] hover:text-white flex items-center justify-center cursor-pointer">
+              <button
+                onClick={() => {
+                  setActiveForm('reseller');
+                  document.getElementById('onboarding-section')?.scrollIntoView({ behavior: 'smooth' });
+                }}
+                className="bg-white text-[#d00504] px-8 py-4 rounded-full font-bold tracking-wide transition-all border-2 border-[#d00504] hover:bg-[#d00504] hover:text-white flex items-center justify-center cursor-pointer"
+              >
                 BECOME A RESELLER
               </button>
             </div>
@@ -666,7 +809,7 @@ export default function App() {
         </section>
 
         {/* ABOUT US SECTION */}
-        <section className="bg-[#d00504] text-white px-6 py-20 md:px-12 lg:px-24 w-full">
+        <section id="about" className="bg-[#d00504] text-white px-6 py-20 md:px-12 lg:px-24 w-full">
           <div className="max-w-4xl mx-auto flex flex-col gap-8 text-center md:text-left">
             <h2 className="reveal-wipe-left text-3xl md:text-4xl font-bold border-b border-white/30 pb-4 inline-block w-fit mx-auto md:mx-0">
               About Us
@@ -836,7 +979,7 @@ export default function App() {
         </section>
 
         {/* THE FOODIFY NETWORK SECTION (NOW INTERACTIVE CHAT FAQS) */}
-        <section className="bg-gradient-to-br from-[#ffbc00] to-[#ffcd38] text-black px-4 py-12 md:px-12 lg:px-24 w-full relative overflow-hidden border-t-2 border-b-2 border-amber-400/20">
+        <section id="faqs" className="bg-gradient-to-br from-[#ffbc00] to-[#ffcd38] text-black px-4 py-12 md:px-12 lg:px-24 w-full relative overflow-hidden border-t-2 border-b-2 border-amber-400/20">
           {/* Subtle warm decorative glowing highlights */}
           <div className="absolute -top-12 -left-12 w-64 h-64 bg-white/20 rounded-full blur-[80px] pointer-events-none" />
           <div className="absolute -bottom-12 -right-12 w-64 h-64 bg-[#d00504]/10 rounded-full blur-[80px] pointer-events-none animate-pulse" style={{ animationDuration: '6s' }} />
@@ -846,10 +989,10 @@ export default function App() {
             {/* Section Header */}
             <div className="text-center max-w-2xl mx-auto flex flex-col gap-3">
               <span className="text-[10px] md:text-xs font-black tracking-widest text-[#d00504] bg-[#d00504]/10 border border-[#d00504]/20 px-3 py-1 rounded-full w-fit mx-auto uppercase">
-                Support Center
+                Interactive Support Chat
               </span>
               <h2 className="reveal-wipe-left text-3xl md:text-4xl font-black uppercase tracking-tight text-gray-900" style={{ fontFamily: "'Playfair Display', serif" }}>
-                Interactive Support Chat
+                Frequently Asked Questions
               </h2>
               <p className="reveal-fade-up text-sm font-bold text-gray-800/80" style={{ transitionDelay: "200ms" }}>
                 Have questions? Choose a category on the left, type keywords to search, or ask the Foodify Assistant.
@@ -1180,130 +1323,440 @@ export default function App() {
             )}
 
             {activeForm === 'merchant' && (
-              <div className="w-full max-w-3xl mx-auto flex flex-col gap-6 py-8 px-4 text-left select-text" onClick={(e) => e.stopPropagation()}>
-                {/* Back Button */}
-                <button
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    resetForms();
-                  }}
-                  className="flex items-center gap-2 text-xs font-black hover:underline self-start uppercase tracking-widest mb-4 cursor-pointer text-yellow-400 hover:text-yellow-300"
-                >
-                  ← Back to options
-                </button>
-
-                {!merchantSubmitted && (
-                  <form onSubmit={handleMerchantSubmit} className="flex flex-col gap-6 w-full animate-[fadeIn_0.5s_ease-out_forwards]">
-                    <div>
-                      <h3 className="text-3.5xl font-black uppercase tracking-tight" style={{ fontFamily: "'Playfair Display', serif" }}>Merchant Application</h3>
-                      <p className="text-sm font-semibold text-white/80 mt-1 font-sans">Submit your details and get listed on our reseller catalogue within 48 hours.</p>
-                    </div>
-
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4 font-sans">
-                      <div className="flex flex-col gap-1.5">
-                        <label className="text-xs font-black uppercase tracking-wider">Kitchen / Business Name</label>
-                        <input
-                          type="text"
-                          required
-                          value={merchantData.businessName}
-                          onChange={(e) => setMerchantData({ ...merchantData, businessName: e.target.value })}
-                          placeholder="e.g. Grandma's Kitchen"
-                          className="bg-white/15 border border-white/20 rounded-xl px-4 py-3 text-sm font-bold text-white placeholder-white/30 focus:border-white focus:outline-none focus:bg-white/20 transition-all shadow-inner"
-                        />
-                      </div>
-
-                      <div className="flex flex-col gap-1.5">
-                        <label className="text-xs font-black uppercase tracking-wider">Contact Person Name</label>
-                        <input
-                          type="text"
-                          required
-                          value={merchantData.contactName}
-                          onChange={(e) => setMerchantData({ ...merchantData, contactName: e.target.value })}
-                          placeholder="e.g. Jane Doe"
-                          className="bg-white/15 border border-white/20 rounded-xl px-4 py-3 text-sm font-bold text-white placeholder-white/30 focus:border-white focus:outline-none focus:bg-white/20 transition-all shadow-inner"
-                        />
-                      </div>
-
-                      <div className="flex flex-col gap-1.5">
-                        <label className="text-xs font-black uppercase tracking-wider">Phone / Mobile Number</label>
-                        <input
-                          type="tel"
-                          required
-                          value={merchantData.phone}
-                          onChange={(e) => setMerchantData({ ...merchantData, phone: e.target.value })}
-                          placeholder="e.g. 09171234567"
-                          className="bg-white/15 border border-white/20 rounded-xl px-4 py-3 text-sm font-bold text-white placeholder-white/30 focus:border-white focus:outline-none focus:bg-white/20 transition-all shadow-inner"
-                        />
-                      </div>
-
-                      <div className="flex flex-col gap-1.5">
-                        <label className="text-xs font-black uppercase tracking-wider">Food Category</label>
-                        <select
-                          value={merchantData.category}
-                          onChange={(e) => setMerchantData({ ...merchantData, category: e.target.value })}
-                          className="bg-white/15 border border-white/20 rounded-xl px-4 py-3 text-sm font-bold text-white focus:border-white focus:outline-none focus:bg-white/20 transition-all shadow-inner cursor-pointer [&>option]:text-black [&>option]:font-bold"
-                        >
-                          <option value="Home Kitchen">Home Kitchen Cook</option>
-                          <option value="Restaurant">Restaurant / Cafe</option>
-                          <option value="Bakery">Bakery & Pastries</option>
-                          <option value="Beverage">Drinks & Beverages</option>
-                          <option value="Dessert">Sweets & Desserts</option>
-                        </select>
-                      </div>
-
-                      <div className="flex flex-col gap-1.5 md:col-span-2">
-                        <label className="text-xs font-black uppercase tracking-wider">Address / Kitchen Location</label>
-                        <input
-                          type="text"
-                          required
-                          value={merchantData.address}
-                          onChange={(e) => setMerchantData({ ...merchantData, address: e.target.value })}
-                          placeholder="Unit, Street, Barangay, City"
-                          className="bg-white/15 border border-white/20 rounded-xl px-4 py-3 text-sm font-bold text-white placeholder-white/30 focus:border-white focus:outline-none focus:bg-white/20 transition-all shadow-inner"
-                        />
-                      </div>
-
-                      <div className="flex flex-col gap-1.5 md:col-span-2">
-                        <label className="text-xs font-black uppercase tracking-wider">Barangay Permit / Business ID</label>
-                        <input
-                          type="text"
-                          required
-                          value={merchantData.permitId}
-                          onChange={(e) => setMerchantData({ ...merchantData, permitId: e.target.value })}
-                          placeholder="e.g. BRGY-123456"
-                          className="bg-white/15 border border-white/20 rounded-xl px-4 py-3 text-sm font-bold text-white placeholder-white/30 focus:border-white focus:outline-none focus:bg-white/20 transition-all shadow-inner"
-                        />
-                      </div>
-                    </div>
-
-                    <button
-                      type="submit"
-                      className="bg-white text-[#d00504] py-4 rounded-full font-black uppercase tracking-widest hover:bg-[#ffbc00] hover:text-black transition-colors duration-300 text-xs mt-2 shadow-md cursor-pointer text-center"
-                    >
-                      Submit Registration
-                    </button>
-                  </form>
+              <>
+                {bookingStep !== 4 && (
+                  <button
+                    type="button"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      resetForms();
+                    }}
+                    className="absolute right-6 top-1/2 -translate-y-1/2 w-12 h-12 rounded-full bg-[#ffbc00] text-black shadow-xl flex items-center justify-center transition-all duration-300 cursor-pointer z-50 border-2 border-black hover:bg-[#d00504] hover:text-white hover:border-[#d00504] animate-[fadeIn_0.5s_ease-out_forwards]"
+                    title="Back to options"
+                  >
+                    <ArrowLeft className="w-6 h-6" />
+                  </button>
                 )}
+                <div className="w-full py-6 md:py-10 px-4 flex justify-center items-center select-text z-10" onClick={(e) => e.stopPropagation()}>
+                  <div
+                    className={`w-full bg-white rounded-3xl shadow-2xl border border-slate-100 overflow-hidden flex flex-col md:flex-row text-slate-800 transition-all duration-500 ease-in-out ${bookingStep === 4 ? 'max-w-xl' : 'max-w-4xl'
+                      }`}
+                    style={{ height: '480px' }}
+                  >
+                    {/* Left Column (Info Panel) - Hidden in Success step for better focus */}
+                    {bookingStep !== 4 && (
+                      <div className="w-full md:w-60 shrink-0 p-5 md:p-6 flex flex-col justify-between border-b md:border-b-0 md:border-r border-slate-200/80 bg-white">
+                        <div className="flex flex-col text-left">
 
-                {merchantSubmitted && (
-                  <div className="flex flex-col items-center text-center gap-4 py-12 animate-[fadeIn_0.5s_ease-out_forwards]">
-                    <span className="text-6xl animate-bounce">🎉</span>
-                    <h3 className="text-3.5xl font-black uppercase" style={{ fontFamily: "'Playfair Display', serif" }}>Application Sent!</h3>
-                    <p className="text-sm font-semibold opacity-90 max-w-lg font-sans leading-relaxed">
-                      Thank you, <strong>{merchantData.contactName}</strong>! We've registered <strong>{merchantData.businessName}</strong>. Our onboarding manager will verify your Barangay Permit (<strong>{merchantData.permitId}</strong>) and contact you at <strong>{merchantData.phone}</strong> in 48 hours.
-                    </p>
-                    <button
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        resetForms();
-                      }}
-                      className="mt-6 px-10 py-3.5 bg-white text-[#d00504] font-black rounded-full uppercase tracking-wider text-xs hover:bg-[#ffbc00] hover:text-black transition-colors cursor-pointer shadow-md"
-                    >
-                      Return Home
-                    </button>
+                          <img src={favicon} alt="Foodify Logo" className="w-14 h-14 object-contain mb-4" />
+                          <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1.5 font-sans">Foodify</span>
+                          <h3 className="text-2xl font-black text-slate-900 leading-tight mb-6 font-sans">Book a FREE Webinar with Foodify!</h3>
+
+                          <div className="flex flex-col gap-3.5 font-sans">
+                            <div className="flex items-center gap-3 text-sm font-semibold text-slate-650">
+                              <Clock className="w-4.5 h-4.5 text-slate-400 shrink-0" />
+                              <span>60 Minutes</span>
+                            </div>
+                            <div className="flex items-center gap-3 text-sm font-semibold text-slate-650">
+                              <MapPin className="w-4.5 h-4.5 text-slate-400 shrink-0" />
+                              <span className="capitalize">foodify webinar</span>
+                            </div>
+
+                            {/* Selected time details */}
+                            {selectedDate !== null && selectedTime !== null && (
+                              <div className="flex items-center gap-3 text-sm font-semibold text-slate-655 animate-[fadeIn_0.3s_ease-out_forwards]">
+                                <Calendar className="w-4.5 h-4.5 text-slate-400 shrink-0" />
+                                <span>{getTimeSlotRange(selectedTime, timeFormat)}, {MONTH_NAMES[currentMonth]} {selectedDate}, {currentYear}</span>
+                              </div>
+                            )}
+
+                            {selectedDate !== null && selectedTime !== null && (
+                              <div className="flex items-center gap-3 text-sm font-semibold text-slate-655 animate-[fadeIn_0.3s_ease-out_forwards]">
+                                <Globe className="w-4.5 h-4.5 text-slate-400 shrink-0" />
+                                <span>{timezone}</span>
+                              </div>
+                            )}
+                          </div>
+                        </div>
+                      </div>
+                    )}
+
+                    {/* Right Column (Interactive Panel) */}
+                    <div className="flex-grow p-5 flex flex-col justify-center bg-white overflow-y-auto md:overflow-y-visible">
+                      {/* Step 1 & 2: Calendar & Time Picker */}
+                      {bookingStep <= 2 && (
+                        <div className="flex flex-col md:flex-row gap-4 md:gap-5 h-full items-stretch">
+                          {/* Calendar Core */}
+                          <div className="flex-grow flex flex-col text-left justify-between">
+                            <div>
+                              {/* Month Navigation */}
+                              <div className="flex items-center justify-between mb-6">
+                                <h4 className="text-lg font-black text-slate-800 font-sans">
+                                  {MONTH_NAMES[currentMonth]} {currentYear}
+                                </h4>
+                                <div className="flex items-center gap-2">
+                                  <button
+                                    type="button"
+                                    onClick={handlePrevMonth}
+                                    className="p-2 border border-slate-200 hover:bg-slate-50 hover:border-[#d00504] hover:text-[#d00504] rounded-full transition-all cursor-pointer text-slate-600"
+                                  >
+                                    <ChevronLeft className="w-4 h-4" />
+                                  </button>
+                                  <button
+                                    type="button"
+                                    onClick={handleNextMonth}
+                                    className="p-2 border border-slate-200 hover:bg-slate-50 hover:border-[#d00504] hover:text-[#d00504] rounded-full transition-all cursor-pointer text-slate-600"
+                                  >
+                                    <ChevronRight className="w-4 h-4" />
+                                  </button>
+                                </div>
+                              </div>
+
+                              {/* Weekday headers */}
+                              <div className="grid grid-cols-7 gap-0.5 text-center text-[9px] font-black text-slate-400 uppercase tracking-widest mb-2 font-sans">
+                                <div>Sun</div>
+                                <div>Mon</div>
+                                <div>Tue</div>
+                                <div>Wed</div>
+                                <div>Thu</div>
+                                <div>Fri</div>
+                                <div>Sat</div>
+                              </div>
+
+                              {/* Grid of Days */}
+                              <div className="grid grid-cols-7 gap-0.5 text-center text-xs font-bold font-sans">
+                                {getDaysInMonth(currentYear, currentMonth).map((day, idx) => {
+                                  if (day === null) {
+                                    return <div key={`empty-${idx}`} className="h-8 md:h-9 w-full" />;
+                                  }
+
+                                  const isSelected = selectedDate === day;
+                                  const isAvailable = isDateAvailable(currentYear, currentMonth, day);
+                                  const isToday = day === 20 && currentMonth === 6 && currentYear === 2026; // July 20, 2026
+
+                                  let cellClass = "h-8 md:h-9 w-full flex items-center justify-center rounded-xl select-none relative font-sans text-xs transition-all font-bold ";
+                                  let onClickHandler = undefined;
+
+                                  if (isSelected) {
+                                    cellClass += "bg-[#d00504] text-white font-bold cursor-pointer shadow-md shadow-[#d00504]/20";
+                                    onClickHandler = () => {
+                                      setSelectedDate(null);
+                                      setSelectedTime(null);
+                                      setBookingStep(1);
+                                    };
+                                  } else if (isAvailable) {
+                                    cellClass += "bg-slate-100 text-slate-850 hover:bg-[#d00504]/10 hover:text-[#d00504] cursor-pointer";
+                                    onClickHandler = () => {
+                                      setSelectedDate(day);
+                                      setSelectedTime(null);
+                                      setBookingStep(2);
+                                    };
+                                  } else {
+                                    cellClass += "text-slate-350 opacity-40 pointer-events-none";
+                                  }
+
+                                  return (
+                                    <button
+                                      key={idx}
+                                      type="button"
+                                      onClick={onClickHandler}
+                                      disabled={!isAvailable && !isSelected}
+                                      className={cellClass}
+                                    >
+                                      <span>{day}</span>
+                                      {/* Small dots */}
+                                      {isSelected && (
+                                        <span className="absolute bottom-1 w-1 h-1 bg-white rounded-full animate-fade-in" />
+                                      )}
+                                      {isToday && !isSelected && (
+                                        <span className="absolute bottom-1 w-1 h-1 bg-[#d00504] rounded-full animate-pulse" />
+                                      )}
+                                    </button>
+                                  );
+                                })}
+                              </div>
+                            </div>
+
+                            {/* Timezone Selector */}
+                            <div className="mt-3 flex flex-col gap-1 border-t border-slate-100 pt-2.5">
+                              <label className="text-[10px] font-black uppercase tracking-wider text-slate-400">Timezone</label>
+                              <div className="relative">
+                                <select
+                                  value={timezone}
+                                  onChange={(e) => setTimezone(e.target.value)}
+                                  className="w-full bg-white border border-slate-200 hover:border-slate-350 focus:border-[#d00504] rounded-lg px-3 py-2 text-xs font-bold text-slate-800 focus:outline-none transition-all shadow-sm cursor-pointer appearance-none bg-[url('data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22292.4%22%20height%3D%22292.4%22%3E%3Cpath%20fill%3D%22%25234A5568%22%20d%3D%22M287%2069.4a17.6%2017.6%200%200%200-13-5.4H18.4c-5%200-9.3%201.8-12.9%205.4A17.6%2017.6%200%200%200%200%2082.2c0%205%201.8%209.3%205.4%2012.9l128%20127.9c3.6%203.6%207.8%205.4%2012.8%205.4s9.2-1.8%2012.8-5.4L287%2095c3.5-3.5%205.4-7.8%205.4-12.8%200-5-1.9-9.2-5.5-12.8z%22%2F%3E%3C%2Fsvg%3E')] bg-[length:10px_10px] bg-[position:right_12px_center] bg-no-repeat pr-8"
+                                >
+                                  <option value="Asia/Manila">Asia/Manila</option>
+                                  <option value="Asia/Singapore">Asia/Singapore</option>
+                                  <option value="Asia/Tokyo">Asia/Tokyo</option>
+                                  <option value="America/New_York">America/New_York (EST)</option>
+                                  <option value="Europe/London">Europe/London (GMT)</option>
+                                </select>
+                              </div>
+                            </div>
+                          </div>
+                          {/* Step 2: Time Slot Picker Column */}
+                          {bookingStep === 2 && selectedDate !== null && (
+                            <div className="w-full md:w-40 shrink-0 md:border-l border-slate-200/80 md:pl-4 flex flex-col text-left font-sans animate-[fadeIn_0.3s_ease-out_forwards]">
+                              {/* Date Header & Toggle */}
+                              <div className="flex items-center justify-between mb-4 border-b border-slate-150 pb-2.5">
+                                <span className="text-xs font-black text-slate-800 uppercase tracking-tight">
+                                  {MONTH_NAMES[currentMonth].substring(0, 3)} {selectedDate}
+                                </span>
+
+                                {/* 12h/24h toggle */}
+                                <div className="bg-slate-100 p-0.5 rounded-lg flex items-center border border-slate-150">
+                                  <button
+                                    type="button"
+                                    onClick={() => setTimeFormat("12h")}
+                                    className={`text-[9px] font-extrabold px-1.5 py-0.5 rounded transition-all cursor-pointer ${timeFormat === "12h" ? "bg-white text-[#d00504] shadow-sm" : "text-slate-500 hover:text-slate-700"
+                                      }`}
+                                  >
+                                    12h
+                                  </button>
+                                  <button
+                                    type="button"
+                                    onClick={() => setTimeFormat("24h")}
+                                    className={`text-[9px] font-extrabold px-1.5 py-0.5 rounded transition-all cursor-pointer ${timeFormat === "24h" ? "bg-white text-[#d00504] shadow-sm" : "text-slate-500 hover:text-slate-700"
+                                      }`}
+                                  >
+                                    24h
+                                  </button>
+                                </div>
+                              </div>
+
+                              {/* Available Slot Cards */}
+                              <div className="flex flex-col gap-2.5">
+                                {["11:00 AM", "03:00 PM"].map((time, idx) => {
+                                  const timeText = timeFormat === "12h" ? time : (time === "11:00 AM" ? "11:00" : "15:00");
+                                  const isTimeSelected = selectedTime === time;
+
+                                  return (
+                                    <div key={idx} className="flex flex-col gap-1.5">
+                                      <button
+                                        type="button"
+                                        onClick={() => setSelectedTime(time)}
+                                        className={`w-full py-2.5 px-3 border text-center rounded-lg font-bold text-xs transition-all cursor-pointer ${isTimeSelected
+                                          ? "bg-[#d00504] text-white border-[#d00504] shadow-md shadow-[#d00504]/10"
+                                          : "border-[#d00504]/20 bg-[#d00504]/5 text-[#d00504] hover:border-[#d00504] hover:bg-[#d00504]/10"
+                                          }`}
+                                      >
+                                        {timeText}
+                                      </button>
+                                      {isTimeSelected && (
+                                        <button
+                                          type="button"
+                                          onClick={() => setBookingStep(3)}
+                                          className="w-full py-2 px-3 bg-[#d00504] text-white rounded-lg font-black text-[10px] uppercase tracking-wider shadow-md hover:bg-red-700 transition-colors animate-[ascend_0.2s_ease-out_forwards] cursor-pointer text-center"
+                                        >
+                                          Confirm
+                                        </button>
+                                      )}
+                                    </div>
+                                  );
+                                })}
+                              </div>
+                            </div>
+                          )}
+                        </div>
+                      )}
+
+                      {/* Step 3: Entering details */}
+                      {bookingStep === 3 && (
+                        <div className="flex-grow flex flex-col text-left animate-[fadeIn_0.4s_ease-out_forwards]">
+                          {/* Header with circular back button */}
+                          <div className="flex items-center gap-3.5 mb-6">
+                            <button
+                              type="button"
+                              onClick={() => setBookingStep(2)}
+                              className="w-8 h-8 rounded-full border border-slate-200 flex items-center justify-center text-slate-500 hover:text-slate-800 hover:bg-slate-50 transition-all cursor-pointer shrink-0"
+                            >
+                              <ArrowLeft className="w-4 h-4" />
+                            </button>
+                            <h4 className="text-xl font-black text-slate-800 uppercase tracking-wide font-sans">Enter Details</h4>
+                          </div>
+
+                          {/* Registration Form */}
+                          <form onSubmit={handleSupplierBookingSubmit} className="flex flex-col gap-3 font-sans max-h-[360px] overflow-y-auto pr-1">
+                            <div className="flex flex-col gap-1">
+                              <label className="text-[10px] font-black uppercase tracking-wider text-slate-700">Your Name *</label>
+                              <input
+                                type="text"
+                                required
+                                value={supplierFormData.name}
+                                onChange={(e) => setSupplierFormData({ ...supplierFormData, name: e.target.value })}
+                                placeholder="Your Name"
+                                className="bg-white border border-slate-200 rounded-lg px-3 py-2 text-xs font-semibold text-slate-800 focus:border-[#d00504] focus:outline-none transition-all shadow-sm"
+                              />
+                            </div>
+
+                            <div className="flex flex-col gap-1">
+                              <label className="text-[10px] font-black uppercase tracking-wider text-slate-700">Your Email *</label>
+                              <input
+                                type="email"
+                                required
+                                value={supplierFormData.email}
+                                onChange={(e) => setSupplierFormData({ ...supplierFormData, email: e.target.value })}
+                                placeholder="Your Email"
+                                className="bg-white border border-slate-200 rounded-lg px-3 py-2 text-xs font-semibold text-slate-800 focus:border-[#d00504] focus:outline-none transition-all shadow-sm"
+                              />
+                            </div>
+
+                            {/* Country select & Telephone input combo */}
+                            <div className="flex flex-col gap-1">
+                              <label className="text-[10px] font-black uppercase tracking-wider text-slate-700">Active Mobile Number *</label>
+                              <div className="flex relative items-stretch">
+                                {/* Country Code Toggle */}
+                                <button
+                                  type="button"
+                                  onClick={() => setShowFlagDropdown(!showFlagDropdown)}
+                                  className="bg-slate-50 border border-slate-200 border-r-0 rounded-l-lg px-2.5 flex items-center gap-1 text-slate-800 text-xs font-bold hover:bg-slate-100 transition-colors cursor-pointer select-none"
+                                >
+                                  <span className="text-base leading-none">{currentCountry.flag}</span>
+                                  <span>{currentCountry.code}</span>
+                                  <span className="text-[8px] text-slate-400">▼</span>
+                                </button>
+
+                                {/* Flag Dropdown List */}
+                                {showFlagDropdown && (
+                                  <div className="absolute top-full left-0 mt-1 bg-white border border-slate-200 rounded-xl shadow-xl z-50 py-1.5 w-48 text-left animate-[fadeIn_0.15s_ease-out_forwards]">
+                                    {countries.map((c) => (
+                                      <button
+                                        key={c.code}
+                                        type="button"
+                                        onClick={() => {
+                                          setSupplierFormData({ ...supplierFormData, countryCode: c.code });
+                                          setShowFlagDropdown(false);
+                                        }}
+                                        className="w-full px-2.5 py-1.5 text-[10px] font-bold text-slate-750 hover:bg-slate-50 flex items-center gap-2 cursor-pointer transition-colors"
+                                      >
+                                        <span className="text-sm">{c.flag}</span>
+                                        <span className="text-slate-400 font-semibold">{c.code}</span>
+                                        <span className="truncate">{c.name}</span>
+                                      </button>
+                                    ))}
+                                  </div>
+                                )}
+
+                                {/* input */}
+                                <input
+                                  type="tel"
+                                  required
+                                  value={supplierFormData.phone}
+                                  onChange={(e) => setSupplierFormData({ ...supplierFormData, phone: e.target.value })}
+                                  placeholder={currentCountry.placeholder}
+                                  className="border border-slate-200 rounded-r-lg px-3 py-2 text-xs font-semibold text-slate-800 placeholder-slate-400/80 focus:border-[#d00504] focus:outline-none flex-grow shadow-sm bg-white"
+                                />
+                              </div>
+                            </div>
+
+                            <div className="flex flex-col gap-1">
+                              <label className="text-[10px] font-black uppercase tracking-wider text-slate-700">Business Name *</label>
+                              <input
+                                type="text"
+                                required
+                                value={supplierFormData.businessName}
+                                onChange={(e) => setSupplierFormData({ ...supplierFormData, businessName: e.target.value })}
+                                placeholder="Business Name"
+                                className="bg-white border border-slate-200 rounded-lg px-3 py-2 text-xs font-semibold text-slate-800 focus:border-[#d00504] focus:outline-none transition-all shadow-sm"
+                              />
+                            </div>
+
+                            <div className="flex flex-col gap-1">
+                              <label className="text-[10px] font-black uppercase tracking-wider text-slate-700">Location / Branch Area *</label>
+                              <input
+                                type="text"
+                                required
+                                value={supplierFormData.location}
+                                onChange={(e) => setSupplierFormData({ ...supplierFormData, location: e.target.value })}
+                                placeholder="Location / Branch Area"
+                                className="bg-white border border-slate-200 rounded-lg px-3 py-2 text-xs font-semibold text-slate-800 focus:border-[#d00504] focus:outline-none transition-all shadow-sm"
+                              />
+                            </div>
+
+                            <div className="flex flex-col gap-1">
+                              <label className="text-[10px] font-black uppercase tracking-wider text-slate-700">What food products do you sell? *</label>
+                              <input
+                                type="text"
+                                required
+                                value={supplierFormData.foodProducts}
+                                onChange={(e) => setSupplierFormData({ ...supplierFormData, foodProducts: e.target.value })}
+                                placeholder="What food products do you sell?"
+                                className="bg-white border border-slate-200 rounded-lg px-3 py-2 text-xs font-semibold text-slate-800 focus:border-[#d00504] focus:outline-none transition-all shadow-sm"
+                              />
+                            </div>
+
+                            <div className="flex flex-col gap-1">
+                              <label className="text-[10px] font-black uppercase tracking-wider text-slate-700">Do you currently accept online orders? *</label>
+                              <div className="relative">
+                                <select
+                                  required
+                                  value={supplierFormData.acceptOnline}
+                                  onChange={(e) => setSupplierFormData({ ...supplierFormData, acceptOnline: e.target.value })}
+                                  className="w-full bg-white border border-slate-200 rounded-lg px-3 py-2 text-xs font-bold text-slate-800 focus:border-[#d00504] focus:outline-none transition-all shadow-sm cursor-pointer appearance-none bg-[url('data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22292.4%22%20height%3D%22292.4%22%3E%3Cpath%20fill%3D%22%25234A5568%22%20d%3D%22M287%2069.4a17.6%2017.6%200%200%200-13-5.4H18.4c-5%200-9.3%201.8-12.9%205.4A17.6%2017.6%200%200%200%200%2082.2c0%205%201.8%209.3%205.4%2012.9l128%20127.9c3.6%203.6%207.8%205.4%2012.8%205.4s9.2-1.8%2012.8-5.4L287%2095c3.5-3.5%205.4-7.8%205.4-12.8%200-5-1.9-9.2-5.5-12.8z%22%2F%3E%3C%2Fsvg%3E')] bg-[length:10px_10px] bg-[position:right_12px_center] bg-no-repeat pr-8"
+                                >
+                                  <option value="" disabled hidden>Select option</option>
+                                  <option value="Yes">Yes</option>
+                                  <option value="No">No</option>
+                                </select>
+                              </div>
+                            </div>
+
+                            <button
+                              type="submit"
+                              className="bg-[#d00504] text-white py-2.5 px-5 rounded-lg font-black uppercase tracking-wider text-xs hover:bg-red-700 transition-colors shadow-md cursor-pointer text-center self-end mt-2"
+                            >
+                              Schedule Meeting
+                            </button>
+                          </form>
+                        </div>
+                      )}
+
+                      {/* Step 4: Success state */}
+                      {bookingStep === 4 && (
+                        <div className="flex flex-col items-center text-center gap-4 py-8 px-4 animate-[fadeIn_0.5s_ease-out_forwards]">
+                          <div className="w-16 h-16 rounded-full bg-emerald-100 flex items-center justify-center text-emerald-600 mb-2">
+                            <Check className="w-8 h-8" />
+                          </div>
+                          <h3 className="text-3.5xl font-black uppercase text-slate-800" style={{ fontFamily: "'Playfair Display', serif" }}>Webinar Booked!</h3>
+                          <p className="text-sm font-semibold text-slate-650 max-w-md font-sans leading-relaxed">
+                            Thank you, <strong>{supplierFormData.name}</strong>! Your supplier onboarding webinar has been scheduled.
+                          </p>
+
+                          <div className="bg-slate-50 rounded-2xl p-5 border border-slate-100 w-full max-w-sm text-left my-2 font-sans flex flex-col gap-2.5">
+                            <div className="flex items-center gap-2.5 text-xs font-bold text-slate-400 uppercase tracking-wider border-b border-slate-150 pb-2">
+                              <span>Meeting Details</span>
+                            </div>
+                            <div className="flex items-center gap-3 text-sm font-semibold text-slate-850">
+                              <Calendar className="w-4 h-4 text-slate-400 shrink-0" />
+                              <span>{MONTH_NAMES[currentMonth]} {selectedDate}, {currentYear}</span>
+                            </div>
+                            <div className="flex items-center gap-3 text-sm font-semibold text-slate-855">
+                              <Clock className="w-4 h-4 text-slate-400 shrink-0" />
+                              <span>{getTimeSlotRange(selectedTime || "", timeFormat)}</span>
+                            </div>
+                            <div className="flex items-center gap-3 text-sm font-semibold text-slate-855">
+                              <Globe className="w-4 h-4 text-slate-400 shrink-0" />
+                              <span>{timezone}</span>
+                            </div>
+                          </div>
+
+                          <p className="text-xs text-slate-500 font-medium">
+                            A confirmation email has been sent to <strong>{supplierFormData.email}</strong>.
+                          </p>
+
+                          <button
+                            onClick={() => resetForms()}
+                            className="mt-4 px-10 py-3 bg-[#d00504] text-white font-black rounded-full uppercase tracking-wider text-xs hover:bg-[#ffbc00] hover:text-black transition-colors cursor-pointer shadow-md"
+                          >
+                            Return Home
+                          </button>
+                        </div>
+                      )}
+                    </div>
                   </div>
-                )}
-              </div>
+                </div>
+              </>
             )}
           </div>
 
@@ -1361,128 +1814,163 @@ export default function App() {
             )}
 
             {activeForm === 'reseller' && (
-              <div className="w-full max-w-3xl mx-auto flex flex-col gap-6 py-8 px-4 text-left select-text" onClick={(e) => e.stopPropagation()}>
-                {/* Back Button */}
+              <>
                 <button
+                  type="button"
                   onClick={(e) => {
                     e.stopPropagation();
                     resetForms();
                   }}
-                  className="flex items-center gap-2 text-xs font-black hover:underline self-start uppercase tracking-widest mb-4 cursor-pointer text-red-600 hover:text-red-800"
+                  className="absolute left-6 top-1/2 -translate-y-1/2 w-12 h-12 rounded-full bg-[#d00504] text-white shadow-xl flex items-center justify-center transition-all duration-300 cursor-pointer z-50 border-2 border-[#d00504] hover:bg-[#ffbc00] hover:text-black hover:border-black animate-[fadeIn_0.5s_ease-out_forwards]"
+                  title="Back to options"
                 >
-                  ← Back to options
+                  <ArrowLeft className="w-6 h-6" />
                 </button>
 
-                {!resellerSubmitted && (
-                  <form onSubmit={handleResellerSubmit} className="flex flex-col gap-6 w-full animate-[fadeIn_0.5s_ease-out_forwards] text-black">
-                    <div>
-                      <h3 className="text-3.5xl font-black uppercase tracking-tight text-black" style={{ fontFamily: "'Playfair Display', serif" }}>Reseller Sign Up</h3>
-                      <p className="text-sm font-semibold text-black/80 mt-1 font-sans">Get free access to our merchant menu catalog and start selling instantly.</p>
+                {/* Reseller two-column card container */}
+                <div className="w-full py-6 md:py-10 px-4 flex justify-center items-center select-text z-10 animate-[fadeIn_0.5s_ease-out_forwards]" onClick={(e) => e.stopPropagation()}>
+                  <div className="w-full max-w-4xl bg-white rounded-3xl shadow-2xl border border-slate-100 overflow-hidden flex flex-col md:flex-row text-slate-800" style={{ height: '480px' }}>
+
+                    {/* Left Info Panel */}
+                    {!resellerSubmitted && (
+                      <div className="w-full md:w-60 shrink-0 p-5 md:p-6 flex flex-col justify-between border-b md:border-b-0 md:border-r border-slate-200/80 bg-white">
+                        <div className="flex flex-col text-left">
+                          <img src={favicon} alt="Foodify Logo" className="w-14 h-14 object-contain mb-4" />
+                          <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1.5 font-sans">Foodify</span>
+                          <h3 className="text-2xl font-black text-slate-900 leading-tight mb-6 font-sans">Sign Up to Become a Reseller with Foodify!</h3>
+                          <div className="flex flex-col gap-3.5 font-sans">
+                            <div className="flex items-start gap-3 text-sm font-semibold text-slate-650">
+                              <Users className="w-4 h-4 text-slate-400 shrink-0 mt-0.5" />
+                              <span>Free signup — no fees</span>
+                            </div>
+                            <div className="flex items-start gap-3 text-sm font-semibold text-slate-650">
+                              <MapPin className="w-4 h-4 text-slate-400 shrink-0 mt-0.5" />
+                              <span>Sell local food online</span>
+                            </div>
+                            <div className="flex items-start gap-3 text-sm font-semibold text-slate-650">
+                              <Globe className="w-4 h-4 text-slate-400 shrink-0 mt-0.5" />
+                              <span>Commission-based earnings</span>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    )}
+
+                    {/* Right Form Panel */}
+                    <div className="flex-grow p-5 flex flex-col justify-center bg-white">
+                      {!resellerSubmitted && (
+                        <form onSubmit={handleResellerSubmit} className="flex flex-col gap-3 font-sans max-h-[360px] overflow-y-auto pr-1">
+                          <div>
+                            <h4 className="text-xl font-black text-slate-800 uppercase tracking-wide font-sans">Reseller Sign Up</h4>
+                            <p className="text-xs font-semibold text-slate-500 mt-0.5 font-sans">Get free access to our merchant catalog and start selling instantly.</p>
+                          </div>
+
+                          <div className="flex flex-col gap-1">
+                            <label className="text-[10px] font-black uppercase tracking-wider text-slate-700">Full Name *</label>
+                            <input
+                              type="text"
+                              required
+                              value={resellerData.fullName}
+                              onChange={(e) => setResellerData({ ...resellerData, fullName: e.target.value })}
+                              placeholder="Full Name"
+                              className="bg-white border border-slate-200 rounded-lg px-3 py-2 text-xs font-semibold text-slate-800 placeholder-slate-400 focus:border-[#d00504] focus:outline-none transition-all shadow-sm"
+                            />
+                          </div>
+
+                          <div className="flex flex-col gap-1">
+                            <label className="text-[10px] font-black uppercase tracking-wider text-slate-700">Email Address *</label>
+                            <input
+                              type="email"
+                              required
+                              value={resellerData.email}
+                              onChange={(e) => setResellerData({ ...resellerData, email: e.target.value })}
+                              placeholder="Email Address"
+                              className="bg-white border border-slate-200 rounded-lg px-3 py-2 text-xs font-semibold text-slate-800 placeholder-slate-400 focus:border-[#d00504] focus:outline-none transition-all shadow-sm"
+                            />
+                          </div>
+
+                          <div className="flex flex-col gap-1">
+                            <label className="text-[10px] font-black uppercase tracking-wider text-slate-700">Mobile Number *</label>
+                            <input
+                              type="tel"
+                              required
+                              value={resellerData.phone}
+                              onChange={(e) => setResellerData({ ...resellerData, phone: e.target.value })}
+                              placeholder="Mobile Number"
+                              className="bg-white border border-slate-200 rounded-lg px-3 py-2 text-xs font-semibold text-slate-800 placeholder-slate-400 focus:border-[#d00504] focus:outline-none transition-all shadow-sm"
+                            />
+                          </div>
+
+                          <div className="flex flex-col gap-1">
+                            <label className="text-[10px] font-black uppercase tracking-wider text-slate-700">Social Media Link (FB/IG) *</label>
+                            <input
+                              type="url"
+                              required
+                              value={resellerData.socialLink}
+                              onChange={(e) => setResellerData({ ...resellerData, socialLink: e.target.value })}
+                              placeholder="Social Media Link (FB / IG)"
+                              className="bg-white border border-slate-200 rounded-lg px-3 py-2 text-xs font-semibold text-slate-800 placeholder-slate-400 focus:border-[#d00504] focus:outline-none transition-all shadow-sm"
+                            />
+                          </div>
+
+                          <div className="flex flex-col gap-1">
+                            <label className="text-[10px] font-black uppercase tracking-wider text-slate-700">Preferred Cashout Channel *</label>
+                            <div className="relative">
+                              <select
+                                value={resellerData.cashoutMethod}
+                                onChange={(e) => setResellerData({ ...resellerData, cashoutMethod: e.target.value })}
+                                className="w-full bg-white border border-slate-200 rounded-lg px-3 py-2 text-xs font-bold text-slate-800 focus:border-[#d00504] focus:outline-none transition-all shadow-sm cursor-pointer appearance-none bg-[url('data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22292.4%22%20height%3D%22292.4%22%3E%3Cpath%20fill%3D%22%25234A5568%22%20d%3D%22M287%2069.4a17.6%2017.6%200%200%200-13-5.4H18.4c-5%200-9.3%201.8-12.9%205.4A17.6%2017.6%200%200%200%200%2082.2c0%205%201.8%209.3%205.4%2012.9l128%20127.9c3.6%203.6%207.8%205.4%2012.8%205.4s9.2-1.8%2012.8-5.4L287%2095c3.5-3.5%205.4-7.8%205.4-12.8%200-5-1.9-9.2-5.5-12.8z%22%2F%3E%3C%2Fsvg%3E')] bg-[length:10px_10px] bg-[position:right_12px_center] bg-no-repeat pr-8"
+                              >
+                                <option value="GCash">GCash</option>
+                                <option value="Maya">Maya Wallet</option>
+                                <option value="Bank">Bank Transfer</option>
+                              </select>
+                            </div>
+                          </div>
+
+                          <div className="flex flex-col gap-1">
+                            <label className="text-[10px] font-black uppercase tracking-wider text-slate-700">Cashout Wallet Mobile Number *</label>
+                            <input
+                              type="text"
+                              required
+                              value={resellerData.accountNumber}
+                              onChange={(e) => setResellerData({ ...resellerData, accountNumber: e.target.value })}
+                              placeholder="Cashout Wallet Number"
+                              className="bg-white border border-slate-200 rounded-lg px-3 py-2 text-xs font-semibold text-slate-800 placeholder-slate-400 focus:border-[#d00504] focus:outline-none transition-all shadow-sm"
+                            />
+                          </div>
+
+                          <button
+                            type="submit"
+                            className="bg-black text-[#ffbc00] py-2.5 rounded-lg font-black uppercase tracking-widest hover:bg-white hover:text-black border-2 border-black transition-colors duration-300 text-xs mt-1 shadow-md cursor-pointer text-center"
+                          >
+                            Start Reselling
+                          </button>
+                        </form>
+                      )}
+
+                      {resellerSubmitted && (
+                        <div className="flex flex-col items-center text-center gap-4 py-12 animate-[fadeIn_0.5s_ease-out_forwards]">
+                          <span className="text-6xl animate-bounce">🚀</span>
+                          <h3 className="text-3.5xl font-black uppercase text-slate-900" style={{ fontFamily: "'Playfair Display', serif" }}>Account Created!</h3>
+                          <p className="text-sm font-semibold text-slate-600 max-w-lg font-sans leading-relaxed">
+                            Welcome, <strong>{resellerData.fullName}</strong>! We've set up your reseller panel. Check <strong>{resellerData.email}</strong> for your temporary passcode and training catalogs.
+                          </p>
+                          <button
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              resetForms();
+                            }}
+                            className="mt-4 px-10 py-3.5 bg-black text-[#ffbc00] font-black border-2 border-black rounded-full uppercase tracking-wider text-xs hover:bg-white hover:text-black transition-colors cursor-pointer shadow-md"
+                          >
+                            Return Home
+                          </button>
+                        </div>
+                      )}
                     </div>
-
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4 font-sans">
-                      <div className="flex flex-col gap-1.5">
-                        <label className="text-xs font-black uppercase tracking-wider text-black">Full Name</label>
-                        <input
-                          type="text"
-                          required
-                          value={resellerData.fullName}
-                          onChange={(e) => setResellerData({ ...resellerData, fullName: e.target.value })}
-                          placeholder="e.g. John Doe"
-                          className="bg-black/5 border border-black/20 rounded-xl px-4 py-3 text-sm font-bold text-black placeholder-black/40 focus:border-black focus:outline-none focus:bg-black/10 transition-all shadow-inner"
-                        />
-                      </div>
-
-                      <div className="flex flex-col gap-1.5">
-                        <label className="text-xs font-black uppercase tracking-wider text-black">Email Address</label>
-                        <input
-                          type="email"
-                          required
-                          value={resellerData.email}
-                          onChange={(e) => setResellerData({ ...resellerData, email: e.target.value })}
-                          placeholder="e.g. john@example.com"
-                          className="bg-black/5 border border-black/20 rounded-xl px-4 py-3 text-sm font-bold text-black placeholder-black/40 focus:border-black focus:outline-none focus:bg-black/10 transition-all shadow-inner"
-                        />
-                      </div>
-
-                      <div className="flex flex-col gap-1.5">
-                        <label className="text-xs font-black uppercase tracking-wider text-black">Mobile Number</label>
-                        <input
-                          type="tel"
-                          required
-                          value={resellerData.phone}
-                          onChange={(e) => setResellerData({ ...resellerData, phone: e.target.value })}
-                          placeholder="e.g. 09171234567"
-                          className="bg-black/5 border border-black/20 rounded-xl px-4 py-3 text-sm font-bold text-black placeholder-black/40 focus:border-black focus:outline-none focus:bg-black/10 transition-all shadow-inner"
-                        />
-                      </div>
-
-                      <div className="flex flex-col gap-1.5">
-                        <label className="text-xs font-black uppercase tracking-wider text-black">Social Media Link (FB/IG)</label>
-                        <input
-                          type="url"
-                          required
-                          value={resellerData.socialLink}
-                          onChange={(e) => setResellerData({ ...resellerData, socialLink: e.target.value })}
-                          placeholder="Facebook profile url"
-                          className="bg-black/5 border border-black/20 rounded-xl px-4 py-3 text-sm font-bold text-black placeholder-black/40 focus:border-black focus:outline-none focus:bg-black/10 transition-all shadow-inner"
-                        />
-                      </div>
-
-                      <div className="flex flex-col gap-1.5">
-                        <label className="text-xs font-black uppercase tracking-wider text-black">Preferred Cashout Channel</label>
-                        <select
-                          value={resellerData.cashoutMethod}
-                          onChange={(e) => setResellerData({ ...resellerData, cashoutMethod: e.target.value })}
-                          className="bg-black/5 border border-black/20 rounded-xl px-4 py-3 text-sm font-bold text-black focus:border-black focus:outline-none focus:bg-black/10 transition-all shadow-inner cursor-pointer font-bold"
-                        >
-                          <option value="GCash">GCash</option>
-                          <option value="Maya">Maya Wallet</option>
-                          <option value="Bank">Bank Transfer</option>
-                        </select>
-                      </div>
-
-                      <div className="flex flex-col gap-1.5">
-                        <label className="text-xs font-black uppercase tracking-wider text-black">Cashout Wallet Mobile Number</label>
-                        <input
-                          type="text"
-                          required
-                          value={resellerData.accountNumber}
-                          onChange={(e) => setResellerData({ ...resellerData, accountNumber: e.target.value })}
-                          placeholder="e.g. 09171234567"
-                          className="bg-black/5 border border-black/20 rounded-xl px-4 py-3 text-sm font-bold text-black placeholder-black/40 focus:border-black focus:outline-none focus:bg-black/10 transition-all shadow-inner"
-                        />
-                      </div>
-                    </div>
-
-                    <button
-                      type="submit"
-                      className="bg-black text-[#ffbc00] py-4 rounded-full font-black uppercase tracking-widest hover:bg-white hover:text-black border-2 border-black transition-colors duration-300 text-xs mt-2 shadow-md cursor-pointer text-center"
-                    >
-                      Start Reselling
-                    </button>
-                  </form>
-                )}
-
-                {resellerSubmitted && (
-                  <div className="flex flex-col items-center text-center gap-4 py-12 animate-[fadeIn_0.5s_ease-out_forwards]">
-                    <span className="text-6xl animate-bounce">🚀</span>
-                    <h3 className="text-3.5xl font-black uppercase text-black" style={{ fontFamily: "'Playfair Display', serif" }}>Account Created!</h3>
-                    <p className="text-sm font-semibold text-black/90 max-w-lg font-sans leading-relaxed">
-                      Welcome, <strong>{resellerData.fullName}</strong>! We've set up your reseller panel with GCash wallet <strong>{resellerData.accountNumber}</strong>. Check <strong>{resellerData.email}</strong> for your temporary passcode and training catalogs.
-                    </p>
-                    <button
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        resetForms();
-                      }}
-                      className="mt-6 px-10 py-3.5 bg-black text-[#ffbc00] font-black border-2 border-black rounded-full uppercase tracking-wider text-xs hover:bg-white hover:text-black transition-colors cursor-pointer shadow-md"
-                    >
-                      Return Home
-                    </button>
                   </div>
-                )}
-              </div>
+                </div>
+              </>
             )}
           </div>
         </section>
