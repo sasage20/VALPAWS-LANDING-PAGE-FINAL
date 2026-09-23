@@ -31,7 +31,10 @@ import {
   ChevronDown,
   ArrowLeft,
   Check,
-  Download
+  Download,
+  BookOpen,
+  Smartphone,
+  ShieldCheck
 } from "lucide-react";
 
 // @ts-ignore
@@ -822,12 +825,13 @@ export default function App() {
                 </a>
                 <button
                   onClick={() => {
-                    setActiveForm('reseller');
+                    setActiveForm('merchant');
                     document.getElementById('onboarding-section')?.scrollIntoView({ behavior: 'smooth' });
                   }}
-                  className="bg-white text-[#15803d] px-8 py-4 rounded-full font-bold tracking-wide transition-all border-2 border-[#15803d] hover:bg-[#15803d] hover:text-white flex items-center justify-center cursor-pointer"
+                  className="bg-white text-[#15803d] px-8 py-4 rounded-full font-bold tracking-wide transition-all border-2 border-[#15803d] hover:bg-[#15803d] hover:text-white flex items-center justify-center cursor-pointer gap-2"
                 >
-                  SCHEDULE TAG PICKUP
+                  <BookOpen className="w-5 h-5" />
+                  INSTALLATION GUIDE
                 </button>
               </div>
 
@@ -1398,13 +1402,13 @@ export default function App() {
               Get Started with ValPaws!
             </h2>
             <p className="reveal-fade-up text-sm md:text-base font-bold text-gray-650 max-w-2xl font-sans" style={{ transitionDelay: '100ms' }}>
-              Pre-register your pet details online to speed up verification, or schedule an appointment to pick up and assign your pet's NFC collar tag at the local office.
+              Follow our step-by-step installation guide to set up the ValPaws Android application on your device, or directly download the official APK.
             </p>
           </div>
 
           <div className="w-full flex flex-col lg:flex-row min-h-[480px] overflow-hidden select-none relative">
 
-            {/* LEFT PANEL: MERCHANT ONBOARDING */}
+            {/* LEFT PANEL: INSTALLATION GUIDE */}
             <div
               onClick={() => activeForm === 'split' && setActiveForm('merchant')}
               className={leftClasses}
@@ -1428,7 +1432,7 @@ export default function App() {
             >
               {activeForm === 'split' && (
                 <div className="flex flex-col items-center text-center max-w-sm transition-all duration-300 transform group-hover:scale-105">
-                  <Store
+                  <BookOpen
                     className={`w-16 h-16 mb-4 text-white transition-transform duration-300 group-hover:rotate-6 transition-opacity duration-[500ms] ease-out ${onboardingVisible ? "opacity-100" : "opacity-0"
                       }`}
                     style={{ transitionDelay: onboardingVisible ? "800ms" : "0ms" }}
@@ -1438,456 +1442,112 @@ export default function App() {
                       }`}
                     style={{ transitionDelay: onboardingVisible ? "900ms" : "0ms", fontFamily: "'Playfair Display', serif" }}
                   >
-                    Register Your Pet
+                    Installation Guide
                   </h3>
                   <p
                     className={`text-sm font-medium opacity-90 mb-6 font-sans transition-opacity duration-[500ms] ease-out ${onboardingVisible ? "opacity-100" : "opacity-0"
                       }`}
                     style={{ transitionDelay: onboardingVisible ? "1050ms" : "0ms" }}
                   >
-                    Register your pet details, upload medical documents, and prepare your pet for digital identification.
+                    Follow our simple step-by-step guide to download, enable permissions, and install the ValPaws Android app on your smartphone.
                   </p>
                   <button
                     className={`px-8 py-3 rounded-full border-2 border-white font-extrabold uppercase tracking-widest text-xs transition-all duration-300 bg-transparent text-white group-hover:bg-white group-hover:text-[#15803d] shadow-sm cursor-pointer transition-opacity duration-[500ms] ease-out ${onboardingVisible ? "opacity-100" : "opacity-0"
                       }`}
                     style={{ transitionDelay: onboardingVisible ? "1200ms" : "0ms" }}
                   >
-                    Register Pet Now
+                    View Installation Guide
                   </button>
                 </div>
               )}
 
               {activeForm === 'merchant' && (
                 <>
-                  {bookingStep !== 4 && (
-                    <button
-                      type="button"
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        resetForms();
-                      }}
-                      className="absolute right-6 top-28 w-12 h-12 rounded-full bg-[#ffbc00] text-black shadow-xl flex items-center justify-center transition-all duration-300 cursor-pointer z-50 border-2 border-black hover:bg-[#15803d] hover:text-white hover:border-[#15803d] animate-[fadeIn_0.5s_ease-out_forwards]"
-                      title="Back to options"
-                    >
-                      <ArrowLeft className="w-6 h-6" />
-                    </button>
-                  )}
+                  <button
+                    type="button"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      resetForms();
+                    }}
+                    className="absolute right-6 top-28 w-12 h-12 rounded-full bg-[#ffbc00] text-black shadow-xl flex items-center justify-center transition-all duration-300 cursor-pointer z-50 border-2 border-black hover:bg-[#15803d] hover:text-white hover:border-[#15803d] animate-[fadeIn_0.5s_ease-out_forwards]"
+                    title="Back to options"
+                  >
+                    <ArrowLeft className="w-6 h-6" />
+                  </button>
                   <div className="w-full py-6 md:py-10 px-4 flex justify-center items-center select-text z-10" onClick={(e) => e.stopPropagation()}>
                     <div
-                      className={`w-full bg-white rounded-3xl shadow-2xl border border-slate-100 overflow-hidden flex flex-col md:flex-row text-slate-800 transition-all duration-500 ease-in-out ${bookingStep === 4 ? 'max-w-xl' : 'max-w-4xl'
-                        }`}
+                      className="w-full max-w-4xl bg-white rounded-3xl shadow-2xl border border-slate-100 overflow-hidden flex flex-col md:flex-row text-slate-800"
                       style={{ height: '480px' }}
                     >
-                      {/* Left Column (Info Panel) - Hidden in Success step for better focus */}
-                      {bookingStep !== 4 && (
-                        <div className="w-full md:w-60 shrink-0 p-5 md:p-6 flex flex-col justify-between border-b md:border-b-0 md:border-r border-slate-200/80 bg-white">
-                          <div className="flex flex-col text-left">
+                      {/* Left Info Panel */}
+                      <div className="w-full md:w-64 shrink-0 p-6 flex flex-col justify-between border-b md:border-b-0 md:border-r border-slate-200/80 bg-slate-50">
+                        <div className="flex flex-col text-left">
+                          <img src={favicon} alt="ValPaws Logo" className="w-14 h-14 object-contain mb-4" />
+                          <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1.5 font-sans">ValPaws Guide</span>
+                          <h3 className="text-2xl font-black text-slate-900 leading-tight mb-4 font-sans">App Installation Steps</h3>
+                          <p className="text-xs text-slate-600 font-medium leading-relaxed font-sans mb-4">
+                            Quick guide to install the ValPaws Android application (.apk) on your mobile device smoothly.
+                          </p>
+                          <div className="bg-[#15803d]/10 p-3 rounded-xl border border-[#15803d]/20 text-[11px] font-semibold text-[#15803d]">
+                            💡 Tip: Make sure NFC is enabled on your phone for tag reading!
+                          </div>
+                        </div>
+                      </div>
 
-                            <img src={favicon} alt="ValPaws Logo" className="w-14 h-14 object-contain mb-4" />
-                            <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1.5 font-sans">ValPaws</span>
-                            <h3 className="text-2xl font-black text-slate-900 leading-tight mb-6 font-sans">Schedule NFC Collar Tagging!</h3>
+                      {/* Right Panel: Step by Step Guide */}
+                      <div className="flex-grow p-6 flex flex-col justify-between bg-white overflow-y-auto font-sans text-left">
+                        <h4 className="text-lg font-black text-slate-900 uppercase tracking-wide mb-4">4-Step Quick Setup</h4>
 
-                            <div className="flex flex-col gap-3.5 font-sans">
-                              <div className="flex items-center gap-3 text-sm font-semibold text-slate-650">
-                                <Clock className="w-4.5 h-4.5 text-slate-400 shrink-0" />
-                                <span>15-Minute Tag Verification</span>
-                              </div>
-                              <div className="flex items-center gap-3 text-sm font-semibold text-slate-650">
-                                <MapPin className="w-4.5 h-4.5 text-slate-400 shrink-0" />
-                                <span className="capitalize">NFC tag setup & pickup</span>
-                              </div>
+                        <div className="grid gap-3">
+                          <div className="flex items-start gap-3 p-3 rounded-xl bg-slate-50 border border-slate-150">
+                            <span className="w-7 h-7 rounded-full bg-[#15803d] text-white font-black text-xs flex items-center justify-center shrink-0 mt-0.5">1</span>
+                            <div>
+                              <h5 className="text-xs font-bold text-slate-900 uppercase">Download APK Package</h5>
+                              <p className="text-[11px] text-slate-600 font-medium">Click the button below to download the latest <code>21.Sep.2026.ValPaws.apk</code> file.</p>
+                            </div>
+                          </div>
 
-                              {/* Selected time details */}
-                              {selectedDate !== null && selectedTime !== null && (
-                                <div className="flex items-center gap-3 text-sm font-semibold text-slate-655 animate-[fadeIn_0.3s_ease-out_forwards]">
-                                  <Calendar className="w-4.5 h-4.5 text-slate-400 shrink-0" />
-                                  <span>{getTimeSlotRange(selectedTime, timeFormat)}, {MONTH_NAMES[currentMonth]} {selectedDate}, {currentYear}</span>
-                                </div>
-                              )}
+                          <div className="flex items-start gap-3 p-3 rounded-xl bg-slate-50 border border-slate-150">
+                            <span className="w-7 h-7 rounded-full bg-[#15803d] text-white font-black text-xs flex items-center justify-center shrink-0 mt-0.5">2</span>
+                            <div>
+                              <h5 className="text-xs font-bold text-slate-900 uppercase">Allow Unknown Sources</h5>
+                              <p className="text-[11px] text-slate-600 font-medium">When prompted by Android, tap <strong>Settings</strong> and enable <em>"Allow from this source"</em>.</p>
+                            </div>
+                          </div>
 
-                              {selectedDate !== null && selectedTime !== null && (
-                                <div className="flex items-center gap-3 text-sm font-semibold text-slate-655 animate-[fadeIn_0.3s_ease-out_forwards]">
-                                  <Globe className="w-4.5 h-4.5 text-slate-400 shrink-0" />
-                                  <span>{timezone}</span>
-                                </div>
-                              )}
+                          <div className="flex items-start gap-3 p-3 rounded-xl bg-slate-50 border border-slate-150">
+                            <span className="w-7 h-7 rounded-full bg-[#15803d] text-white font-black text-xs flex items-center justify-center shrink-0 mt-0.5">3</span>
+                            <div>
+                              <h5 className="text-xs font-bold text-slate-900 uppercase">Install the App</h5>
+                              <p className="text-[11px] text-slate-600 font-medium">Open your <strong>Downloads</strong> folder, tap the downloaded APK file, and select <strong>Install</strong>.</p>
+                            </div>
+                          </div>
+
+                          <div className="flex items-start gap-3 p-3 rounded-xl bg-slate-50 border border-slate-150">
+                            <span className="w-7 h-7 rounded-full bg-[#15803d] text-white font-black text-xs flex items-center justify-center shrink-0 mt-0.5">4</span>
+                            <div>
+                              <h5 className="text-xs font-bold text-slate-900 uppercase">Launch & Scan NFC Tags</h5>
+                              <p className="text-[11px] text-slate-600 font-medium">Open ValPaws, sign in or register your pet details, and scan NFC collar tags!</p>
                             </div>
                           </div>
                         </div>
-                      )}
 
-                      {/* Right Column (Interactive Panel) */}
-                      <div className="flex-grow p-5 flex flex-col justify-center bg-white overflow-y-auto md:overflow-y-visible">
-                        {/* Step 1 & 2: Calendar & Time Picker */}
-                        {bookingStep <= 2 && (
-                          <div className="flex flex-col md:flex-row gap-4 md:gap-5 h-full items-stretch">
-                            {/* Calendar Core */}
-                            <div className="flex-grow flex flex-col text-left justify-between">
-                              <div>
-                                {/* Month Navigation */}
-                                <div className="flex items-center justify-between mb-6">
-                                  <h4 className="text-lg font-black text-slate-800 font-sans">
-                                    {MONTH_NAMES[currentMonth]} {currentYear}
-                                  </h4>
-                                  <div className="flex items-center gap-2">
-                                    <button
-                                      type="button"
-                                      onClick={handlePrevMonth}
-                                      className="p-2 border border-slate-200 hover:bg-slate-50 hover:border-[#15803d] hover:text-[#15803d] rounded-full transition-all cursor-pointer text-slate-600"
-                                    >
-                                      <ChevronLeft className="w-4 h-4" />
-                                    </button>
-                                    <button
-                                      type="button"
-                                      onClick={handleNextMonth}
-                                      className="p-2 border border-slate-200 hover:bg-slate-50 hover:border-[#15803d] hover:text-[#15803d] rounded-full transition-all cursor-pointer text-slate-600"
-                                    >
-                                      <ChevronRight className="w-4 h-4" />
-                                    </button>
-                                  </div>
-                                </div>
-
-                                {/* Weekday headers */}
-                                <div className="grid grid-cols-7 gap-0.5 text-center text-[9px] font-black text-slate-400 uppercase tracking-widest mb-2 font-sans">
-                                  <div>Sun</div>
-                                  <div>Mon</div>
-                                  <div>Tue</div>
-                                  <div>Wed</div>
-                                  <div>Thu</div>
-                                  <div>Fri</div>
-                                  <div>Sat</div>
-                                </div>
-
-                                {/* Grid of Days */}
-                                <div className="grid grid-cols-7 gap-0.5 text-center text-xs font-bold font-sans">
-                                  {getDaysInMonth(currentYear, currentMonth).map((day, idx) => {
-                                    if (day === null) {
-                                      return <div key={`empty-${idx}`} className="h-8 md:h-9 w-full" />;
-                                    }
-
-                                    const isSelected = selectedDate === day;
-                                    const isAvailable = isDateAvailable(currentYear, currentMonth, day);
-                                    const isToday = day === 20 && currentMonth === 6 && currentYear === 2026; // July 20, 2026
-
-                                    let cellClass = "h-8 md:h-9 w-full flex items-center justify-center rounded-xl select-none relative font-sans text-xs transition-all font-bold ";
-                                    let onClickHandler = undefined;
-
-                                    if (isSelected) {
-                                      cellClass += "bg-[#15803d] text-white font-bold cursor-pointer shadow-md shadow-[#15803d]/20";
-                                      onClickHandler = () => {
-                                        setSelectedDate(null);
-                                        setSelectedTime(null);
-                                        setBookingStep(1);
-                                      };
-                                    } else if (isAvailable) {
-                                      cellClass += "bg-slate-100 text-slate-850 hover:bg-[#15803d]/10 hover:text-[#15803d] cursor-pointer";
-                                      onClickHandler = () => {
-                                        setSelectedDate(day);
-                                        setSelectedTime(null);
-                                        setBookingStep(2);
-                                      };
-                                    } else {
-                                      cellClass += "text-slate-350 opacity-40 pointer-events-none";
-                                    }
-
-                                    return (
-                                      <button
-                                        key={idx}
-                                        type="button"
-                                        onClick={onClickHandler}
-                                        disabled={!isAvailable && !isSelected}
-                                        className={cellClass}
-                                      >
-                                        <span>{day}</span>
-                                        {/* Small dots */}
-                                        {isSelected && (
-                                          <span className="absolute bottom-1 w-1 h-1 bg-white rounded-full animate-fade-in" />
-                                        )}
-                                        {isToday && !isSelected && (
-                                          <span className="absolute bottom-1 w-1 h-1 bg-[#15803d] rounded-full animate-pulse" />
-                                        )}
-                                      </button>
-                                    );
-                                  })}
-                                </div>
-                              </div>
-
-                              {/* Timezone Selector */}
-                              <div className="mt-3 flex flex-col gap-1 border-t border-slate-100 pt-2.5">
-                                <label className="text-[10px] font-black uppercase tracking-wider text-slate-400">Timezone</label>
-                                <div className="relative">
-                                  <select
-                                    value={timezone}
-                                    onChange={(e) => setTimezone(e.target.value)}
-                                    className="w-full bg-white border border-slate-200 hover:border-slate-350 focus:border-[#15803d] rounded-lg px-3 py-2 text-xs font-bold text-slate-800 focus:outline-none transition-all shadow-sm cursor-pointer appearance-none bg-[url('data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22292.4%22%20height%3D%22292.4%22%3E%3Cpath%20fill%3D%22%25234A5568%22%20d%3D%22M287%2069.4a17.6%2017.6%200%200%200-13-5.4H18.4c-5%200-9.3%201.8-12.9%205.4A17.6%2017.6%200%200%200%200%2082.2c0%205%201.8%209.3%205.4%2012.9l128%20127.9c3.6%203.6%207.8%205.4%2012.8%205.4s9.2-1.8%2012.8-5.4L287%2095c3.5-3.5%205.4-7.8%205.4-12.8%200-5-1.9-9.2-5.5-12.8z%22%2F%3E%3C%2Fsvg%3E')] bg-[length:10px_10px] bg-[position:right_12px_center] bg-no-repeat pr-8"
-                                  >
-                                    <option value="Asia/Manila">Asia/Manila</option>
-                                    <option value="Asia/Singapore">Asia/Singapore</option>
-                                    <option value="Asia/Tokyo">Asia/Tokyo</option>
-                                    <option value="America/New_York">America/New_York (EST)</option>
-                                    <option value="Europe/London">Europe/London (GMT)</option>
-                                  </select>
-                                </div>
-                              </div>
-                            </div>
-                            {/* Step 2: Time Slot Picker Column */}
-                            {bookingStep === 2 && selectedDate !== null && (
-                              <div className="w-full md:w-40 shrink-0 md:border-l border-slate-200/80 md:pl-4 flex flex-col text-left font-sans animate-[fadeIn_0.3s_ease-out_forwards]">
-                                {/* Date Header & Toggle */}
-                                <div className="flex items-center justify-between mb-4 border-b border-slate-150 pb-2.5">
-                                  <span className="text-xs font-black text-slate-800 uppercase tracking-tight">
-                                    {MONTH_NAMES[currentMonth].substring(0, 3)} {selectedDate}
-                                  </span>
-
-                                  {/* 12h/24h toggle */}
-                                  <div className="bg-slate-100 p-0.5 rounded-lg flex items-center border border-slate-150">
-                                    <button
-                                      type="button"
-                                      onClick={() => setTimeFormat("12h")}
-                                      className={`text-[9px] font-extrabold px-1.5 py-0.5 rounded transition-all cursor-pointer ${timeFormat === "12h" ? "bg-white text-[#15803d] shadow-sm" : "text-slate-500 hover:text-slate-700"
-                                        }`}
-                                    >
-                                      12h
-                                    </button>
-                                    <button
-                                      type="button"
-                                      onClick={() => setTimeFormat("24h")}
-                                      className={`text-[9px] font-extrabold px-1.5 py-0.5 rounded transition-all cursor-pointer ${timeFormat === "24h" ? "bg-white text-[#15803d] shadow-sm" : "text-slate-500 hover:text-slate-700"
-                                        }`}
-                                    >
-                                      24h
-                                    </button>
-                                  </div>
-                                </div>
-
-                                {/* Available Slot Cards */}
-                                <div className="flex flex-col gap-2.5">
-                                  {["11:00 AM", "03:00 PM"].map((time, idx) => {
-                                    const timeText = timeFormat === "12h" ? time : (time === "11:00 AM" ? "11:00" : "15:00");
-                                    const isTimeSelected = selectedTime === time;
-
-                                    return (
-                                      <div key={idx} className="flex flex-col gap-1.5">
-                                        <button
-                                          type="button"
-                                          onClick={() => setSelectedTime(time)}
-                                          className={`w-full py-2.5 px-3 border text-center rounded-lg font-bold text-xs transition-all cursor-pointer ${isTimeSelected
-                                            ? "bg-[#15803d] text-white border-[#15803d] shadow-md shadow-[#15803d]/10"
-                                            : "border-[#15803d]/20 bg-[#15803d]/5 text-[#15803d] hover:border-[#15803d] hover:bg-[#15803d]/10"
-                                            }`}
-                                        >
-                                          {timeText}
-                                        </button>
-                                        {isTimeSelected && (
-                                          <button
-                                            type="button"
-                                            onClick={() => setBookingStep(3)}
-                                            className="w-full py-2 px-3 bg-[#15803d] text-white rounded-lg font-black text-[10px] uppercase tracking-wider shadow-md hover:bg-red-700 transition-colors animate-[ascend_0.2s_ease-out_forwards] cursor-pointer text-center"
-                                          >
-                                            Confirm
-                                          </button>
-                                        )}
-                                      </div>
-                                    );
-                                  })}
-                                </div>
-                              </div>
-                            )}
-                          </div>
-                        )}
-
-                        {/* Step 3: Entering details */}
-                        {bookingStep === 3 && (
-                          <div className="flex-grow flex flex-col text-left animate-[fadeIn_0.4s_ease-out_forwards]">
-                            {/* Header with circular back button */}
-                            <div className="flex items-center gap-3.5 mb-6">
-                              <button
-                                type="button"
-                                onClick={() => setBookingStep(2)}
-                                className="w-8 h-8 rounded-full border border-slate-200 flex items-center justify-center text-slate-500 hover:text-slate-800 hover:bg-slate-50 transition-all cursor-pointer shrink-0"
-                              >
-                                <ArrowLeft className="w-4 h-4" />
-                              </button>
-                              <h4 className="text-xl font-black text-slate-800 uppercase tracking-wide font-sans">Enter Details</h4>
-                            </div>
-
-                            {/* Registration Form */}
-                            <form onSubmit={handleSupplierBookingSubmit} className="flex flex-col gap-3 font-sans max-h-[360px] overflow-y-auto pr-1">
-                              <div className="flex flex-col gap-1">
-                                <label className="text-[10px] font-black uppercase tracking-wider text-slate-700">Your Name *</label>
-                                <input
-                                  type="text"
-                                  required
-                                  value={supplierFormData.name}
-                                  onChange={(e) => setSupplierFormData({ ...supplierFormData, name: e.target.value })}
-                                  placeholder="Your Name"
-                                  className="bg-white border border-slate-200 rounded-lg px-3 py-2 text-xs font-semibold text-slate-800 focus:border-[#15803d] focus:outline-none transition-all shadow-sm"
-                                />
-                              </div>
-
-                              <div className="flex flex-col gap-1">
-                                <label className="text-[10px] font-black uppercase tracking-wider text-slate-700">Your Email *</label>
-                                <input
-                                  type="email"
-                                  required
-                                  value={supplierFormData.email}
-                                  onChange={(e) => setSupplierFormData({ ...supplierFormData, email: e.target.value })}
-                                  placeholder="Your Email"
-                                  className="bg-white border border-slate-200 rounded-lg px-3 py-2 text-xs font-semibold text-slate-800 focus:border-[#15803d] focus:outline-none transition-all shadow-sm"
-                                />
-                              </div>
-
-                              {/* Country select & Telephone input combo */}
-                              <div className="flex flex-col gap-1">
-                                <label className="text-[10px] font-black uppercase tracking-wider text-slate-700">Active Owner's Mobile Number *</label>
-                                <div className="flex relative items-stretch">
-                                  {/* Country Code Toggle */}
-                                  <button
-                                    type="button"
-                                    onClick={() => setShowFlagDropdown(!showFlagDropdown)}
-                                    className="bg-slate-50 border border-slate-200 border-r-0 rounded-l-lg px-2.5 flex items-center gap-1 text-slate-800 text-xs font-bold hover:bg-slate-100 transition-colors cursor-pointer select-none"
-                                  >
-                                    <span className="text-base leading-none">{currentCountry.flag}</span>
-                                    <span>{currentCountry.code}</span>
-                                    <span className="text-[8px] text-slate-400">▼</span>
-                                  </button>
-
-                                  {/* Flag Dropdown List */}
-                                  {showFlagDropdown && (
-                                    <div className="absolute top-full left-0 mt-1 bg-white border border-slate-200 rounded-xl shadow-xl z-50 py-1.5 w-48 text-left animate-[fadeIn_0.15s_ease-out_forwards]">
-                                      {countries.map((c) => (
-                                        <button
-                                          key={c.code}
-                                          type="button"
-                                          onClick={() => {
-                                            setSupplierFormData({ ...supplierFormData, countryCode: c.code });
-                                            setShowFlagDropdown(false);
-                                          }}
-                                          className="w-full px-2.5 py-1.5 text-[10px] font-bold text-slate-750 hover:bg-slate-50 flex items-center gap-2 cursor-pointer transition-colors"
-                                        >
-                                          <span className="text-sm">{c.flag}</span>
-                                          <span className="text-slate-400 font-semibold">{c.code}</span>
-                                          <span className="truncate">{c.name}</span>
-                                        </button>
-                                      ))}
-                                    </div>
-                                  )}
-
-                                  {/* input */}
-                                  <input
-                                    type="tel"
-                                    required
-                                    value={supplierFormData.phone}
-                                    onChange={(e) => setSupplierFormData({ ...supplierFormData, phone: e.target.value })}
-                                    placeholder={currentCountry.placeholder}
-                                    className="border border-slate-200 rounded-r-lg px-3 py-2 text-xs font-semibold text-slate-800 placeholder-slate-400/80 focus:border-[#15803d] focus:outline-none flex-grow shadow-sm bg-white"
-                                  />
-                                </div>
-                              </div>
-
-                              <div className="flex flex-col gap-1">
-                                <label className="text-[10px] font-black uppercase tracking-wider text-slate-700">Pet's Name *</label>
-                                <input
-                                  type="text"
-                                  required
-                                  value={supplierFormData.businessName}
-                                  onChange={(e) => setSupplierFormData({ ...supplierFormData, businessName: e.target.value })}
-                                  placeholder="Pet's Name (e.g. Buddy)"
-                                  className="bg-white border border-slate-200 rounded-lg px-3 py-2 text-xs font-semibold text-slate-800 focus:border-[#15803d] focus:outline-none transition-all shadow-sm"
-                                />
-                              </div>
-
-                              <div className="flex flex-col gap-1">
-                                <label className="text-[10px] font-black uppercase tracking-wider text-slate-700">Home Address / Barangay *</label>
-                                <input
-                                  type="text"
-                                  required
-                                  value={supplierFormData.location}
-                                  onChange={(e) => setSupplierFormData({ ...supplierFormData, location: e.target.value })}
-                                  placeholder="Home Address / Barangay (e.g. Dalandanan)"
-                                  className="bg-white border border-slate-200 rounded-lg px-3 py-2 text-xs font-semibold text-slate-800 focus:border-[#15803d] focus:outline-none transition-all shadow-sm"
-                                />
-                              </div>
-
-                              <div className="flex flex-col gap-1">
-                                <label className="text-[10px] font-black uppercase tracking-wider text-slate-700">Pet Breed & Unique Markings *</label>
-                                <input
-                                  type="text"
-                                  required
-                                  value={supplierFormData.foodProducts}
-                                  onChange={(e) => setSupplierFormData({ ...supplierFormData, foodProducts: e.target.value })}
-                                  placeholder="e.g. Shih Tzu, white and brown patches"
-                                  className="bg-white border border-slate-200 rounded-lg px-3 py-2 text-xs font-semibold text-slate-800 focus:border-[#15803d] focus:outline-none transition-all shadow-sm"
-                                />
-                              </div>
-
-                              <div className="flex flex-col gap-1">
-                                <label className="text-[10px] font-black uppercase tracking-wider text-slate-700">NFC Collar Size *</label>
-                                <div className="relative">
-                                  <select
-                                    required
-                                    value={supplierFormData.acceptOnline}
-                                    onChange={(e) => setSupplierFormData({ ...supplierFormData, acceptOnline: e.target.value })}
-                                    className="w-full bg-white border border-slate-200 rounded-lg px-3 py-2 text-xs font-bold text-slate-800 focus:border-[#15803d] focus:outline-none transition-all shadow-sm cursor-pointer appearance-none bg-[url('data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22292.4%22%20height%3D%22292.4%22%3E%3Cpath%20fill%3D%22%25234A5568%22%20d%3D%22M287%2069.4a17.6%2017.6%200%200%200-13-5.4H18.4c-5%200-9.3%201.8-12.9%205.4A17.6%2017.6%200%200%200%200%2082.2c0%205%201.8%209.3%205.4%2012.9l128%20127.9c3.6%203.6%207.8%205.4%2012.8%205.4s9.2-1.8%2012.8-5.4L287%2095c3.5-3.5%205.4-7.8%205.4-12.8%200-5-1.9-9.2-5.5-12.8z%22%2F%3E%3C%2Fsvg%3E')] bg-[length:10px_10px] bg-[position:right_12px_center] bg-no-repeat pr-8"
-                                  >
-                                    <option value="" disabled hidden>Select option</option>
-                                    <option value="Small">Small (Cats & Small Dogs)</option>
-                                    <option value="Medium/Large">Medium/Large (Dogs)</option>
-                                  </select>
-                                </div>
-                              </div>
-
-                              <button
-                                type="submit"
-                                className="bg-[#15803d] text-white py-2.5 px-5 rounded-lg font-black uppercase tracking-wider text-xs hover:bg-red-700 transition-colors shadow-md cursor-pointer text-center self-end mt-2"
-                              >
-                                Book Appointment
-                              </button>
-                            </form>
-                          </div>
-                        )}
-
-                        {/* Step 4: Success state */}
-                        {bookingStep === 4 && (
-                          <div className="flex flex-col items-center text-center gap-4 py-8 px-4 animate-[fadeIn_0.5s_ease-out_forwards]">
-                            <div className="w-16 h-16 rounded-full bg-emerald-100 flex items-center justify-center text-emerald-600 mb-2">
-                              <Check className="w-8 h-8" />
-                            </div>
-                            <h3 className="text-3.5xl font-black uppercase text-slate-800" style={{ fontFamily: "'Playfair Display', serif" }}>Appointment Scheduled!</h3>
-                            <p className="text-sm font-semibold text-slate-650 max-w-md font-sans leading-relaxed">
-                              Thank you, <strong>{supplierFormData.name}</strong>! Your pet collar tagging appointment has been scheduled.
-                            </p>
-
-                            <div className="bg-slate-50 rounded-2xl p-5 border border-slate-100 w-full max-w-sm text-left my-2 font-sans flex flex-col gap-2.5">
-                              <div className="flex items-center gap-2.5 text-xs font-bold text-slate-400 uppercase tracking-wider border-b border-slate-150 pb-2">
-                                <span>Meeting Details</span>
-                              </div>
-                              <div className="flex items-center gap-3 text-sm font-semibold text-slate-850">
-                                <Calendar className="w-4 h-4 text-slate-400 shrink-0" />
-                                <span>{MONTH_NAMES[currentMonth]} {selectedDate}, {currentYear}</span>
-                              </div>
-                              <div className="flex items-center gap-3 text-sm font-semibold text-slate-855">
-                                <Clock className="w-4 h-4 text-slate-400 shrink-0" />
-                                <span>{getTimeSlotRange(selectedTime || "", timeFormat)}</span>
-                              </div>
-                              <div className="flex items-center gap-3 text-sm font-semibold text-slate-855">
-                                <Globe className="w-4 h-4 text-slate-400 shrink-0" />
-                                <span>{timezone}</span>
-                              </div>
-                            </div>
-
-                            <p className="text-xs text-slate-500 font-medium">
-                              A confirmation email with pickup details and requirements has been sent to <strong>{supplierFormData.email}</strong>.
-                            </p>
-
-                            <button
-                              onClick={() => resetForms()}
-                              className="mt-4 px-10 py-3 bg-[#15803d] text-white font-black rounded-full uppercase tracking-wider text-xs hover:bg-[#ffbc00] hover:text-black transition-colors cursor-pointer shadow-md"
-                            >
-                              Return Home
-                            </button>
-                          </div>
-                        )}
+                        <div className="mt-4 flex items-center justify-between gap-3 pt-3 border-t border-slate-100">
+                          <a
+                            href="https://github.com/sasage20/VALPAWS-APK/releases/latest/download/21.Sep.2026.ValPaws.apk"
+                            download="21.Sep.2026.ValPaws.apk"
+                            className="bg-[#15803d] text-white px-6 py-2.5 rounded-full font-extrabold text-xs uppercase tracking-wider hover:bg-[#166534] transition-all flex items-center gap-2 shadow-sm"
+                          >
+                            <Download className="w-4 h-4" />
+                            Download APK File Now
+                          </a>
+                          <button
+                            onClick={() => setActiveForm('reseller')}
+                            className="text-xs font-bold text-[#15803d] hover:underline cursor-pointer"
+                          >
+                            Go to APK Download Details →
+                          </button>
+                        </div>
                       </div>
                     </div>
                   </div>
@@ -1919,7 +1579,7 @@ export default function App() {
             >
               {activeForm === 'split' && (
                 <div className="flex flex-col items-center text-center max-w-sm transition-all duration-300 transform group-hover:scale-105">
-                  <Users
+                  <Smartphone
                     className={`w-16 h-16 mb-4 text-black transition-transform duration-300 group-hover:-rotate-6 transition-opacity duration-[500ms] ease-out ${onboardingVisible ? "opacity-100" : "opacity-0"
                       }`}
                     style={{ transitionDelay: onboardingVisible ? "800ms" : "0ms" }}
@@ -1929,21 +1589,21 @@ export default function App() {
                       }`}
                     style={{ transitionDelay: onboardingVisible ? "900ms" : "0ms", fontFamily: "'Playfair Display', serif" }}
                   >
-                    Schedule NFC Tagging
+                    Download APK
                   </h3>
                   <p
                     className={`text-sm font-medium text-black/90 mb-6 font-sans transition-opacity duration-[500ms] ease-out ${onboardingVisible ? "opacity-100" : "opacity-0"
                       }`}
                     style={{ transitionDelay: onboardingVisible ? "1050ms" : "0ms" }}
                   >
-                    Schedule a date to pick up and link your pet's physical NFC collar tag at the veterinary pound or barangay hall.
+                    Directly download the official ValPaws Android application package (.apk) file to install on your mobile device.
                   </p>
                   <button
                     className={`px-8 py-3 rounded-full border-2 border-black font-extrabold uppercase tracking-widest text-xs transition-all duration-300 bg-transparent text-black group-hover:bg-black group-hover:text-[#ffbc00] shadow-sm cursor-pointer transition-opacity duration-[500ms] ease-out ${onboardingVisible ? "opacity-100" : "opacity-0"
                       }`}
                     style={{ transitionDelay: onboardingVisible ? "1200ms" : "0ms" }}
                   >
-                    Schedule Tagging Now
+                    Download APK Now
                   </button>
                 </div>
               )}
@@ -1962,147 +1622,88 @@ export default function App() {
                     <ArrowLeft className="w-6 h-6" />
                   </button>
 
-                  {/* Reseller two-column card container */}
+                  {/* APK Download two-column card container */}
                   <div className="w-full py-6 md:py-10 px-4 flex justify-center items-center select-text z-10 animate-[fadeIn_0.5s_ease-out_forwards]" onClick={(e) => e.stopPropagation()}>
                     <div className="w-full max-w-4xl bg-white rounded-3xl shadow-2xl border border-slate-100 overflow-hidden flex flex-col md:flex-row text-slate-800" style={{ height: '480px' }}>
 
                       {/* Left Info Panel */}
-                      {!resellerSubmitted && (
-                        <div className="w-full md:w-60 shrink-0 p-5 md:p-6 flex flex-col justify-between border-b md:border-b-0 md:border-r border-slate-200/80 bg-white">
-                          <div className="flex flex-col text-left">
-                            <img src={favicon} alt="ValPaws Logo" className="w-14 h-14 object-contain mb-4" />
-                            <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1.5 font-sans">ValPaws</span>
-                            <h3 className="text-2xl font-black text-slate-900 leading-tight mb-6 font-sans">Sign Up to Schedule NFC Tagging with ValPaws!</h3>
-                            <div className="flex flex-col gap-3.5 font-sans">
-                              <div className="flex items-start gap-3 text-sm font-semibold text-slate-650">
-                                <Users className="w-4 h-4 text-slate-400 shrink-0 mt-0.5" />
-                                <span>Durable NFC smart collar tag</span>
-                              </div>
-                              <div className="flex items-start gap-3 text-sm font-semibold text-slate-650">
-                                <MapPin className="w-4 h-4 text-slate-400 shrink-0 mt-0.5" />
-                                <span>Digital pet profile & medical doc upload</span>
-                              </div>
-                              <div className="flex items-start gap-3 text-sm font-semibold text-slate-650">
-                                <Globe className="w-4 h-4 text-slate-400 shrink-0 mt-0.5" />
-                                <span>Real-time GPS scan alerts & notifications</span>
-                              </div>
+                      <div className="w-full md:w-64 shrink-0 p-6 flex flex-col justify-between border-b md:border-b-0 md:border-r border-slate-200/80 bg-slate-900 text-white">
+                        <div className="flex flex-col text-left">
+                          <img src={favicon} alt="ValPaws Logo" className="w-14 h-14 object-contain mb-4 bg-white/10 p-2 rounded-2xl" />
+                          <span className="text-[10px] font-bold text-amber-400 uppercase tracking-widest mb-1.5 font-sans">Official Release</span>
+                          <h3 className="text-2xl font-black leading-tight mb-4 font-sans text-white">ValPaws App (.apk)</h3>
+                          <div className="space-y-2 text-xs font-medium text-slate-300 font-sans mb-4">
+                            <div className="flex justify-between border-b border-slate-800 pb-1">
+                              <span className="text-slate-400">Filename:</span>
+                              <span className="font-mono text-[11px] text-emerald-400 font-bold">21.Sep.2026.ValPaws.apk</span>
+                            </div>
+                            <div className="flex justify-between border-b border-slate-800 pb-1">
+                              <span className="text-slate-400">File Size:</span>
+                              <span className="font-bold text-white">117 MB</span>
+                            </div>
+                            <div className="flex justify-between border-b border-slate-800 pb-1">
+                              <span className="text-slate-400">OS Required:</span>
+                              <span className="font-bold text-white">Android 8.0+</span>
+                            </div>
+                            <div className="flex justify-between border-b border-slate-800 pb-1">
+                              <span className="text-slate-400">Build Date:</span>
+                              <span className="font-bold text-white">Sept 21, 2026</span>
+                            </div>
+                          </div>
+                          <div className="bg-emerald-950/80 p-3 rounded-xl border border-emerald-500/30 text-[11px] font-semibold text-emerald-300">
+                            ⚡ Direct & safe release download hosted on GitHub.
+                          </div>
+                        </div>
+                      </div>
+
+                      {/* Right Download Panel */}
+                      <div className="flex-grow p-6 flex flex-col justify-between bg-white text-left font-sans">
+                        <div>
+                          <div className="flex items-center gap-2 mb-2">
+                            <span className="bg-emerald-100 text-emerald-800 text-[10px] font-black uppercase px-2.5 py-1 rounded-full border border-emerald-200">
+                              Latest Version
+                            </span>
+                            <span className="bg-amber-100 text-amber-800 text-[10px] font-black uppercase px-2.5 py-1 rounded-full border border-amber-200">
+                              Android Build
+                            </span>
+                          </div>
+
+                          <h4 className="text-2xl font-black text-slate-900 uppercase tracking-tight mb-2">ValPaws Mobile Package</h4>
+                          <p className="text-xs text-slate-600 font-medium leading-relaxed mb-4">
+                            Install the official ValPaws Android application to enable instant NFC tag scanning, manage pet health records, and receive emergency location alerts.
+                          </p>
+
+                          <div className="space-y-2.5 my-4">
+                            <div className="flex items-center gap-3 p-2.5 rounded-xl bg-slate-50 border border-slate-150 text-xs font-bold text-slate-800">
+                              <ShieldCheck className="w-5 h-5 text-[#15803d] shrink-0" />
+                              <span>Verified, malware-safe official APK release</span>
+                            </div>
+                            <div className="flex items-center gap-3 p-2.5 rounded-xl bg-slate-50 border border-slate-150 text-xs font-bold text-slate-800">
+                              <Smartphone className="w-5 h-5 text-[#15803d] shrink-0" />
+                              <span>Full support for NFC-enabled Android smartphones</span>
                             </div>
                           </div>
                         </div>
-                      )}
 
-                      {/* Right Form Panel */}
-                      <div className="flex-grow p-5 flex flex-col justify-center bg-white">
-                        {!resellerSubmitted && (
-                          <form onSubmit={handleResellerSubmit} className="flex flex-col gap-3 font-sans max-h-[360px] overflow-y-auto pr-1">
-                            <div>
-                              <h4 className="text-xl font-black text-slate-800 uppercase tracking-wide font-sans">Pet Registration Form</h4>
-                              <p className="text-xs font-semibold text-slate-500 mt-0.5 font-sans">Pre-register your pet's physical and health details to prepare for NFC collar assignment.</p>
-                            </div>
-
-                            <div className="flex flex-col gap-1">
-                              <label className="text-[10px] font-black uppercase tracking-wider text-slate-700">Owner's Full Name *</label>
-                              <input
-                                type="text"
-                                required
-                                value={resellerData.fullName}
-                                onChange={(e) => setResellerData({ ...resellerData, fullName: e.target.value })}
-                                placeholder="Owner's Full Name"
-                                className="bg-white border border-slate-200 rounded-lg px-3 py-2 text-xs font-semibold text-slate-800 placeholder-slate-400 focus:border-[#15803d] focus:outline-none transition-all shadow-sm"
-                              />
-                            </div>
-
-                            <div className="flex flex-col gap-1">
-                              <label className="text-[10px] font-black uppercase tracking-wider text-slate-700">Owner's Email Address *</label>
-                              <input
-                                type="email"
-                                required
-                                value={resellerData.email}
-                                onChange={(e) => setResellerData({ ...resellerData, email: e.target.value })}
-                                placeholder="Owner's Email Address"
-                                className="bg-white border border-slate-200 rounded-lg px-3 py-2 text-xs font-semibold text-slate-800 placeholder-slate-400 focus:border-[#15803d] focus:outline-none transition-all shadow-sm"
-                              />
-                            </div>
-
-                            <div className="flex flex-col gap-1">
-                              <label className="text-[10px] font-black uppercase tracking-wider text-slate-700">Owner's Mobile Number *</label>
-                              <input
-                                type="tel"
-                                required
-                                value={resellerData.phone}
-                                onChange={(e) => setResellerData({ ...resellerData, phone: e.target.value })}
-                                placeholder="Owner's Mobile Number"
-                                className="bg-white border border-slate-200 rounded-lg px-3 py-2 text-xs font-semibold text-slate-800 placeholder-slate-400 focus:border-[#15803d] focus:outline-none transition-all shadow-sm"
-                              />
-                            </div>
-
-                            <div className="flex flex-col gap-1">
-                              <label className="text-[10px] font-black uppercase tracking-wider text-slate-700">Pet's Name *</label>
-                              <input
-                                type="url"
-                                required
-                                value={resellerData.socialLink}
-                                onChange={(e) => setResellerData({ ...resellerData, socialLink: e.target.value })}
-                                placeholder="Pet's Name (e.g. Buddy)"
-                                className="bg-white border border-slate-200 rounded-lg px-3 py-2 text-xs font-semibold text-slate-800 placeholder-slate-400 focus:border-[#15803d] focus:outline-none transition-all shadow-sm"
-                              />
-                            </div>
-
-                            <div className="flex flex-col gap-1">
-                              <label className="text-[10px] font-black uppercase tracking-wider text-slate-700">Pet Species *</label>
-                              <div className="relative">
-                                <select
-                                  value={resellerData.cashoutMethod}
-                                  onChange={(e) => setResellerData({ ...resellerData, cashoutMethod: e.target.value })}
-                                  className="w-full bg-white border border-slate-200 rounded-lg px-3 py-2 text-xs font-bold text-slate-800 focus:border-[#15803d] focus:outline-none transition-all shadow-sm cursor-pointer appearance-none bg-[url('data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22292.4%22%20height%3D%22292.4%22%3E%3Cpath%20fill%3D%22%25234A5568%22%20d%3D%22M287%2069.4a17.6%2017.6%200%200%200-13-5.4H18.4c-5%200-9.3%201.8-12.9%205.4A17.6%2017.6%200%200%200%200%2082.2c0%205%201.8%209.3%205.4%2012.9l128%20127.9c3.6%203.6%207.8%205.4%2012.8%205.4s9.2-1.8%2012.8-5.4L287%2095c3.5-3.5%205.4-7.8%205.4-12.8%200-5-1.9-9.2-5.5-12.8z%22%2F%3E%3C%2Fsvg%3E')] bg-[length:10px_10px] bg-[position:right_12px_center] bg-no-repeat pr-8"
-                                >
-                                  <option value="GCash">Dog</option>
-                                  <option value="Maya">Cat</option>
-                                  <option value="Bank">Other</option>
-                                </select>
-                              </div>
-                            </div>
-
-                            <div className="flex flex-col gap-1">
-                              <label className="text-[10px] font-black uppercase tracking-wider text-slate-700">Cashout Wallet Owner's Mobile Number *</label>
-                              <input
-                                type="text"
-                                required
-                                value={resellerData.accountNumber}
-                                onChange={(e) => setResellerData({ ...resellerData, accountNumber: e.target.value })}
-                                placeholder="e.g. Aspin, Brown/White"
-                                className="bg-white border border-slate-200 rounded-lg px-3 py-2 text-xs font-semibold text-slate-800 placeholder-slate-400 focus:border-[#15803d] focus:outline-none transition-all shadow-sm"
-                              />
-                            </div>
-
-                            <button
-                              type="submit"
-                              className="bg-black text-[#ffbc00] py-2.5 rounded-lg font-black uppercase tracking-widest hover:bg-white hover:text-black border-2 border-black transition-colors duration-300 text-xs mt-1 shadow-md cursor-pointer text-center"
-                            >
-                              Submit Pre-Registration
-                            </button>
-                          </form>
-                        )}
-
-                        {resellerSubmitted && (
-                          <div className="flex flex-col items-center text-center gap-4 py-12 animate-[fadeIn_0.5s_ease-out_forwards]">
-                            <span className="text-6xl animate-bounce">🚀</span>
-                            <h3 className="text-3.5xl font-black uppercase text-slate-900" style={{ fontFamily: "'Playfair Display', serif" }}>Pet Pre-Registered!</h3>
-                            <p className="text-sm font-semibold text-slate-600 max-w-lg font-sans leading-relaxed">
-                              Welcome, <strong>{resellerData.fullName}</strong>! We have pre-registered your pet details in the system. Bring your pet to the Valenzuela City Veterinary Pound to link a physical NFC tag.
-                            </p>
-                            <button
-                              onClick={(e) => {
-                                e.stopPropagation();
-                                resetForms();
-                              }}
-                              className="mt-4 px-10 py-3.5 bg-black text-[#ffbc00] font-black border-2 border-black rounded-full uppercase tracking-wider text-xs hover:bg-white hover:text-black transition-colors cursor-pointer shadow-md"
-                            >
-                              Return Home
-                            </button>
-                          </div>
-                        )}
+                        <div className="pt-4 border-t border-slate-150 flex flex-col sm:flex-row items-center justify-between gap-3">
+                          <a
+                            href="https://github.com/sasage20/VALPAWS-APK/releases/latest/download/21.Sep.2026.ValPaws.apk"
+                            download="21.Sep.2026.ValPaws.apk"
+                            className="w-full sm:w-auto bg-[#15803d] hover:bg-[#166534] text-white px-7 py-3 rounded-full font-extrabold text-xs uppercase tracking-wider transition-all flex items-center justify-center gap-2 shadow-md hover:shadow-lg cursor-pointer"
+                          >
+                            <Download className="w-4 h-4" />
+                            Download APK (117 MB)
+                          </a>
+                          <button
+                            type="button"
+                            onClick={() => setActiveForm('merchant')}
+                            className="text-xs font-bold text-[#15803d] hover:underline cursor-pointer"
+                          >
+                            View Installation Guide →
+                          </button>
+                        </div>
                       </div>
+
                     </div>
                   </div>
                 </>
