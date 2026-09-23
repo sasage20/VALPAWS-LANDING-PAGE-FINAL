@@ -813,8 +813,8 @@ export default function App() {
               {/* CTA Buttons */}
               <div className="mt-6 flex flex-wrap items-center justify-start gap-4 w-full" style={{ fontFamily: "'Inter', sans-serif" }}>
                 <a
-                  href="/valpaws_ver.1.0.0.apk"
-                  download="valpaws_ver.1.0.0.apk"
+                  href="https://github.com/sasage20/VALPAWS-APK/releases/latest/download/21.Sep.2026.ValPaws.apk"
+                  download="21.Sep.2026.ValPaws.apk"
                   className="bg-[#15803d] text-white px-8 py-4 rounded-full font-bold tracking-wide transition-all border-2 border-[#15803d] hover:bg-white hover:text-[#15803d] flex items-center justify-center cursor-pointer gap-2 shadow-sm hover:shadow-md"
                 >
                   <Download className="w-5 h-5" />
