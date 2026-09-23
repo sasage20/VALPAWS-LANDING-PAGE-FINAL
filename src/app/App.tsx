@@ -1413,9 +1413,6 @@ export default function App() {
               onClick={() => activeForm === 'split' && setActiveForm('merchant')}
               className={leftClasses}
               style={{
-                backgroundImage: activeForm !== 'reseller' ? `url(${redAsset})` : undefined,
-                backgroundSize: activeForm !== 'reseller' ? "cover" : undefined,
-                backgroundPosition: activeForm !== 'reseller' ? "center" : undefined,
                 transform: prefersReducedMotion
                   ? "none"
                   : activeForm !== "split"
@@ -1560,9 +1557,6 @@ export default function App() {
               onClick={() => activeForm === 'split' && setActiveForm('reseller')}
               className={rightClasses}
               style={{
-                backgroundImage: activeForm !== 'merchant' ? `url(${yellowAsset})` : undefined,
-                backgroundSize: activeForm !== 'merchant' ? "cover" : undefined,
-                backgroundPosition: activeForm !== 'merchant' ? "center" : undefined,
                 transform: prefersReducedMotion
                   ? "none"
                   : activeForm !== "split"
