@@ -737,18 +737,6 @@ export default function App() {
               }`} style={{ transitionDelay: slideSplashPanel ? '0ms' : '240ms' }}>Overview</a>
             <a href="#faqs" className={`hover:text-[#15803d] transition-all duration-150 ease-out transform ${slideSplashPanel ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-2'
               }`} style={{ transitionDelay: slideSplashPanel ? '0ms' : '320ms' }}>FAQs</a>
-
-            {/* Login Button */}
-            <a
-              href="https://valpaws-admin.vercel.app"
-              target="_blank"
-              rel="noopener noreferrer"
-              className={`ml-2 px-6 py-2 rounded-full bg-[#15803d] text-white font-semibold text-sm tracking-wide uppercase shadow-md hover:bg-black transition-all duration-150 ease-out transform hover:scale-105 active:scale-95 cursor-pointer ${slideSplashPanel ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-2'
-                }`}
-              style={{ transitionDelay: slideSplashPanel ? '0ms' : '400ms' }}
-            >
-              Admin Portal
-            </a>
           </nav>
         </div>
       </header>
@@ -818,7 +806,11 @@ export default function App() {
                 <a
                   href="https://github.com/sasage20/VALPAWS-APK/releases/latest/download/21.Sep.2026.ValPaws.apk"
                   download="21.Sep.2026.ValPaws.apk"
-                  className="bg-[#15803d] text-white px-8 py-4 rounded-full font-bold tracking-wide transition-all border-2 border-[#15803d] hover:bg-white hover:text-[#15803d] flex items-center justify-center cursor-pointer gap-2 shadow-sm hover:shadow-md"
+                  onClick={() => {
+                    setActiveForm('reseller');
+                    document.getElementById('onboarding-section')?.scrollIntoView({ behavior: 'smooth' });
+                  }}
+                  className="bg-[#15803d] text-white px-8 py-4 rounded-full font-bold tracking-wide transition-all border-2 border-[#15803d] hover:bg-white hover:text-[#15803d] flex items-center justify-center cursor-pointer gap-2 shadow-sm hover:shadow-md hover:scale-105 active:scale-95"
                 >
                   <Download className="w-5 h-5" />
                   DOWNLOAD APP APK
@@ -828,7 +820,7 @@ export default function App() {
                     setActiveForm('merchant');
                     document.getElementById('onboarding-section')?.scrollIntoView({ behavior: 'smooth' });
                   }}
-                  className="bg-white text-[#15803d] px-8 py-4 rounded-full font-bold tracking-wide transition-all border-2 border-[#15803d] hover:bg-[#15803d] hover:text-white flex items-center justify-center cursor-pointer gap-2"
+                  className="bg-white text-[#15803d] px-8 py-4 rounded-full font-bold tracking-wide transition-all border-2 border-[#15803d] hover:bg-[#15803d] hover:text-white flex items-center justify-center cursor-pointer gap-2 hover:scale-105 active:scale-95"
                 >
                   <BookOpen className="w-5 h-5" />
                   INSTALLATION GUIDE
@@ -1367,7 +1359,7 @@ export default function App() {
                   <span className="text-[9px] font-bold text-gray-400 uppercase tracking-widest text-left">Quick Actions</span>
                   <div className="flex gap-1.5">
                     <a
-                      href="mailto:support@valpaws.ph"
+                      href="mailto:bbsison@valenzuela.gov.ph"
                       className="bg-white hover:bg-gray-50 text-gray-700 hover:text-[#15803d] px-2.5 py-1.5 rounded-lg text-[10px] font-bold border border-gray-200 hover:border-gray-300 transition-all flex items-center gap-1.5 shadow-sm animate-pulse-subtle"
                     >
                       <Mail className="w-3.5 h-3.5 text-gray-450" />
@@ -1449,7 +1441,11 @@ export default function App() {
                     Follow our simple step-by-step guide to download, enable permissions, and install the ValPaws Android app on your smartphone.
                   </p>
                   <button
-                    className={`px-8 py-3 rounded-full border-2 border-white font-extrabold uppercase tracking-widest text-xs transition-all duration-300 bg-transparent text-white group-hover:bg-white group-hover:text-[#15803d] shadow-sm cursor-pointer transition-opacity duration-[500ms] ease-out ${onboardingVisible ? "opacity-100" : "opacity-0"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      setActiveForm('merchant');
+                    }}
+                    className={`px-8 py-3 rounded-full border-2 border-white font-extrabold uppercase tracking-widest text-xs transition-all duration-300 bg-transparent text-white hover:bg-white hover:text-[#15803d] shadow-sm cursor-pointer transition-opacity duration-[500ms] ease-out hover:scale-105 active:scale-95 ${onboardingVisible ? "opacity-100" : "opacity-0"
                       }`}
                     style={{ transitionDelay: onboardingVisible ? "1200ms" : "0ms" }}
                   >
@@ -1466,15 +1462,15 @@ export default function App() {
                       e.stopPropagation();
                       resetForms();
                     }}
-                    className="absolute right-6 top-28 w-12 h-12 rounded-full bg-[#ffbc00] text-black shadow-xl flex items-center justify-center transition-all duration-300 cursor-pointer z-50 border-2 border-black hover:bg-[#15803d] hover:text-white hover:border-[#15803d] animate-[fadeIn_0.5s_ease-out_forwards]"
+                    className="absolute left-3 md:left-8 top-1/2 -translate-y-1/2 w-12 h-12 rounded-full bg-[#ffbc00] text-black shadow-2xl flex items-center justify-center transition-all duration-300 cursor-pointer z-50 border-2 border-black hover:bg-[#15803d] hover:text-white hover:border-[#15803d] hover:scale-110 active:scale-95 animate-slide-in-left"
                     title="Back to options"
                   >
                     <ArrowLeft className="w-6 h-6" />
                   </button>
-                  <div className="w-full py-6 md:py-10 px-4 flex justify-center items-center select-text z-10" onClick={(e) => e.stopPropagation()}>
+                  <div className="w-full py-6 md:py-10 px-4 md:px-24 flex justify-center items-center select-text z-10 animate-slide-in-left" onClick={(e) => e.stopPropagation()}>
                     <div
-                      className="w-full max-w-4xl bg-white rounded-3xl shadow-2xl border border-slate-100 overflow-hidden flex flex-col md:flex-row text-slate-800"
-                      style={{ height: '480px' }}
+                      className="w-full max-w-4xl bg-white rounded-3xl shadow-2xl border border-slate-100 overflow-hidden flex flex-col md:flex-row text-slate-800 transition-all duration-500"
+                      style={{ minHeight: '480px' }}
                     >
                       {/* Left Info Panel */}
                       <div className="w-full md:w-64 shrink-0 p-6 flex flex-col justify-between border-b md:border-b-0 md:border-r border-slate-200/80 bg-slate-50">
@@ -1497,7 +1493,7 @@ export default function App() {
 
                         <div className="grid gap-3">
                           <div className="flex items-start gap-3 p-3 rounded-xl bg-slate-50 border border-slate-150">
-                            <span className="w-7 h-7 rounded-full bg-[#15803d] text-white font-black text-xs flex items-center justify-center shrink-0 mt-0.5">1</span>
+                            <span className="w-7 h-7 rounded-full bg-[#15803d] text-white font-black text-xs flex items-center justify-center shrink-0 mt-0.5 shadow-sm">1</span>
                             <div>
                               <h5 className="text-xs font-bold text-slate-900 uppercase">Download APK Package</h5>
                               <p className="text-[11px] text-slate-600 font-medium">Click the button below to download the latest <code>21.Sep.2026.ValPaws.apk</code> file.</p>
@@ -1505,7 +1501,7 @@ export default function App() {
                           </div>
 
                           <div className="flex items-start gap-3 p-3 rounded-xl bg-slate-50 border border-slate-150">
-                            <span className="w-7 h-7 rounded-full bg-[#15803d] text-white font-black text-xs flex items-center justify-center shrink-0 mt-0.5">2</span>
+                            <span className="w-7 h-7 rounded-full bg-[#15803d] text-white font-black text-xs flex items-center justify-center shrink-0 mt-0.5 shadow-sm">2</span>
                             <div>
                               <h5 className="text-xs font-bold text-slate-900 uppercase">Allow Unknown Sources</h5>
                               <p className="text-[11px] text-slate-600 font-medium">When prompted by Android, tap <strong>Settings</strong> and enable <em>"Allow from this source"</em>.</p>
@@ -1513,7 +1509,7 @@ export default function App() {
                           </div>
 
                           <div className="flex items-start gap-3 p-3 rounded-xl bg-slate-50 border border-slate-150">
-                            <span className="w-7 h-7 rounded-full bg-[#15803d] text-white font-black text-xs flex items-center justify-center shrink-0 mt-0.5">3</span>
+                            <span className="w-7 h-7 rounded-full bg-[#15803d] text-white font-black text-xs flex items-center justify-center shrink-0 mt-0.5 shadow-sm">3</span>
                             <div>
                               <h5 className="text-xs font-bold text-slate-900 uppercase">Install the App</h5>
                               <p className="text-[11px] text-slate-600 font-medium">Open your <strong>Downloads</strong> folder, tap the downloaded APK file, and select <strong>Install</strong>.</p>
@@ -1521,7 +1517,7 @@ export default function App() {
                           </div>
 
                           <div className="flex items-start gap-3 p-3 rounded-xl bg-slate-50 border border-slate-150">
-                            <span className="w-7 h-7 rounded-full bg-[#15803d] text-white font-black text-xs flex items-center justify-center shrink-0 mt-0.5">4</span>
+                            <span className="w-7 h-7 rounded-full bg-[#15803d] text-white font-black text-xs flex items-center justify-center shrink-0 mt-0.5 shadow-sm">4</span>
                             <div>
                               <h5 className="text-xs font-bold text-slate-900 uppercase">Launch & Scan NFC Tags</h5>
                               <p className="text-[11px] text-slate-600 font-medium">Open ValPaws, sign in or register your pet details, and scan NFC collar tags!</p>
@@ -1529,18 +1525,19 @@ export default function App() {
                           </div>
                         </div>
 
-                        <div className="mt-4 flex items-center justify-between gap-3 pt-3 border-t border-slate-100">
+                        <div className="mt-4 flex flex-col sm:flex-row items-center justify-between gap-3 pt-3 border-t border-slate-100">
                           <a
                             href="https://github.com/sasage20/VALPAWS-APK/releases/latest/download/21.Sep.2026.ValPaws.apk"
                             download="21.Sep.2026.ValPaws.apk"
-                            className="bg-[#15803d] text-white px-6 py-2.5 rounded-full font-extrabold text-xs uppercase tracking-wider hover:bg-[#166534] transition-all flex items-center gap-2 shadow-sm"
+                            className="bg-[#15803d] hover:bg-[#166534] text-white px-6 py-2.5 rounded-full font-extrabold text-xs uppercase tracking-wider transition-all flex items-center justify-center gap-2 shadow-sm hover:scale-105 active:scale-95"
                           >
                             <Download className="w-4 h-4" />
                             Download APK File Now
                           </a>
                           <button
+                            type="button"
                             onClick={() => setActiveForm('reseller')}
-                            className="text-xs font-bold text-[#15803d] hover:underline cursor-pointer"
+                            className="text-xs font-bold text-[#15803d] hover:underline cursor-pointer hover:scale-105 transition-transform"
                           >
                             Go to APK Download Details →
                           </button>
@@ -1593,7 +1590,11 @@ export default function App() {
                     Directly download the official ValPaws Android application package (.apk) file to install on your mobile device.
                   </p>
                   <button
-                    className={`px-8 py-3 rounded-full border-2 border-black font-extrabold uppercase tracking-widest text-xs transition-all duration-300 bg-transparent text-black group-hover:bg-black group-hover:text-[#ffbc00] shadow-sm cursor-pointer transition-opacity duration-[500ms] ease-out ${onboardingVisible ? "opacity-100" : "opacity-0"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      setActiveForm('reseller');
+                    }}
+                    className={`px-8 py-3 rounded-full border-2 border-black font-extrabold uppercase tracking-widest text-xs transition-all duration-300 bg-transparent text-black hover:bg-black hover:text-[#ffbc00] shadow-sm cursor-pointer transition-opacity duration-[500ms] ease-out hover:scale-105 active:scale-95 ${onboardingVisible ? "opacity-100" : "opacity-0"
                       }`}
                     style={{ transitionDelay: onboardingVisible ? "1200ms" : "0ms" }}
                   >
@@ -1610,15 +1611,15 @@ export default function App() {
                       e.stopPropagation();
                       resetForms();
                     }}
-                    className="absolute left-6 top-28 w-12 h-12 rounded-full bg-[#15803d] text-white shadow-xl flex items-center justify-center transition-all duration-300 cursor-pointer z-50 border-2 border-[#15803d] hover:bg-[#ffbc00] hover:text-black hover:border-black animate-[fadeIn_0.5s_ease-out_forwards]"
+                    className="absolute left-3 md:left-8 top-1/2 -translate-y-1/2 w-12 h-12 rounded-full bg-[#15803d] text-white shadow-2xl flex items-center justify-center transition-all duration-300 cursor-pointer z-50 border-2 border-[#15803d] hover:bg-[#ffbc00] hover:text-black hover:border-black hover:scale-110 active:scale-95 animate-slide-in-left"
                     title="Back to options"
                   >
                     <ArrowLeft className="w-6 h-6" />
                   </button>
 
                   {/* APK Download two-column card container */}
-                  <div className="w-full py-6 md:py-10 px-4 flex justify-center items-center select-text z-10 animate-[fadeIn_0.5s_ease-out_forwards]" onClick={(e) => e.stopPropagation()}>
-                    <div className="w-full max-w-4xl bg-white rounded-3xl shadow-2xl border border-slate-100 overflow-hidden flex flex-col md:flex-row text-slate-800" style={{ height: '480px' }}>
+                  <div className="w-full py-6 md:py-10 px-4 md:px-24 flex justify-center items-center select-text z-10 animate-slide-in-right" onClick={(e) => e.stopPropagation()}>
+                    <div className="w-full max-w-4xl bg-white rounded-3xl shadow-2xl border border-slate-100 overflow-hidden flex flex-col md:flex-row text-slate-800 transition-all duration-500" style={{ minHeight: '480px' }}>
 
                       {/* Left Info Panel */}
                       <div className="w-full md:w-64 shrink-0 p-6 flex flex-col justify-between border-b md:border-b-0 md:border-r border-slate-200/80 bg-slate-900 text-white">
@@ -1683,7 +1684,7 @@ export default function App() {
                           <a
                             href="https://github.com/sasage20/VALPAWS-APK/releases/latest/download/21.Sep.2026.ValPaws.apk"
                             download="21.Sep.2026.ValPaws.apk"
-                            className="w-full sm:w-auto bg-[#15803d] hover:bg-[#166534] text-white px-7 py-3 rounded-full font-extrabold text-xs uppercase tracking-wider transition-all flex items-center justify-center gap-2 shadow-md hover:shadow-lg cursor-pointer"
+                            className="w-full sm:w-auto bg-[#15803d] hover:bg-[#166534] text-white px-7 py-3 rounded-full font-extrabold text-xs uppercase tracking-wider transition-all flex items-center justify-center gap-2 shadow-md hover:shadow-lg cursor-pointer hover:scale-105 active:scale-95"
                           >
                             <Download className="w-4 h-4" />
                             Download APK (117 MB)
@@ -1691,7 +1692,7 @@ export default function App() {
                           <button
                             type="button"
                             onClick={() => setActiveForm('merchant')}
-                            className="text-xs font-bold text-[#15803d] hover:underline cursor-pointer"
+                            className="text-xs font-bold text-[#15803d] hover:underline cursor-pointer hover:scale-105 transition-transform"
                           >
                             View Installation Guide →
                           </button>
@@ -1722,32 +1723,32 @@ export default function App() {
           <ul className="list-none p-0 m-0 flex flex-col md:flex-row justify-center items-center gap-6 md:gap-12 font-sans w-full">
             {/* Phone */}
             <li className="reveal-fade-up flex items-center gap-3.5 text-sm md:text-base font-bold" style={{ transitionDelay: '100ms' }}>
-              <a href="tel:(02) 8352-2000 (ext. 2111)" className="flex items-center gap-3.5 hover:text-[#15803d] transition-colors group">
+              <a href="tel:+6383522000,2111" className="flex items-center gap-3.5 hover:text-[#15803d] transition-colors group">
                 <div className="flex items-center justify-center w-8 h-8 rounded-full border-2 border-white group-hover:border-[#15803d] shrink-0 transition-colors">
                   <Phone className="w-4 h-4 text-white group-hover:text-[#15803d] fill-transparent transition-colors" />
                 </div>
-                <span className="leading-snug">(02) 8352-2000 (ext. 2111)</span>
+                <span className="leading-snug">+63 8352-2000 loc 2111</span>
               </a>
             </li>
 
             {/* Email */}
             <li className="reveal-fade-up flex items-center gap-3.5 text-sm md:text-base font-bold" style={{ transitionDelay: '200ms' }}>
-              <a href="mailto:marketing@valpaws.ph" className="flex items-center gap-3.5 hover:text-[#15803d] transition-colors group">
+              <a href="mailto:bbsison@valenzuela.gov.ph" className="flex items-center gap-3.5 hover:text-[#15803d] transition-colors group">
                 <div className="flex items-center justify-center w-8 h-8 rounded-full border-2 border-white group-hover:border-[#15803d] shrink-0 transition-colors">
                   <Mail className="w-4 h-4 text-white group-hover:text-[#15803d] fill-transparent transition-colors" />
                 </div>
-                <span className="leading-snug">marketing@valpaws.ph</span>
+                <span className="leading-snug">bbsison@valenzuela.gov.ph</span>
               </a>
             </li>
 
             {/* Address */}
             <li className="reveal-fade-up flex items-center gap-3.5 text-sm md:text-base font-bold" style={{ transitionDelay: '300ms' }}>
-              <a href="https://www.google.com/maps/search/?api=1&query=62+G.+Lazaro+Rd,+Dalandanan,+Valenzuela+City,+1444" target="_blank" rel="noopener noreferrer" className="flex items-center gap-3.5 hover:text-[#15803d] transition-colors group text-center md:text-left">
+              <a href="https://www.google.com/maps/search/?api=1&query=Rubber+Master+Road,+Barangay+Lingunan,+Valenzuela+City" target="_blank" rel="noopener noreferrer" className="flex items-center gap-3.5 hover:text-[#15803d] transition-colors group text-center md:text-left">
                 <div className="flex items-center justify-center w-8 h-8 rounded-full border-2 border-white group-hover:border-[#15803d] shrink-0 transition-colors">
                   <MapPin className="w-4 h-4 text-white group-hover:text-[#15803d] fill-transparent transition-colors" />
                 </div>
                 <span className="leading-snug text-center">
-                  62 G. Lazaro Rd, Dalandanan, Valenzuela City, 1444
+                  Rubber Master Road, Barangay Lingunan, Valenzuela City
                 </span>
               </a>
             </li>
@@ -1755,20 +1756,17 @@ export default function App() {
 
           {/* Social Media Links */}
           <div className="flex justify-center items-center gap-6 mt-4">
-            <a href="https://www.facebook.com/profile.php?id=61577545713907" target="_blank" rel="noopener noreferrer" className="w-10 h-10 rounded-full border border-white/20 flex items-center justify-center text-white/70 hover:text-[#15803d] hover:bg-white hover:border-white transition-all duration-300 shadow-md hover:scale-110 active:scale-95 cursor-pointer">
+            <a href="https://www.facebook.com/ValPetsTechnicalSupport" target="_blank" rel="noopener noreferrer" className="w-10 h-10 rounded-full border border-white/20 flex items-center justify-center text-white/70 hover:text-[#15803d] hover:bg-white hover:border-white transition-all duration-300 shadow-md hover:scale-110 active:scale-95 cursor-pointer" title="Facebook">
               <ion-icon name="logo-facebook" style={{ fontSize: '20px' }}></ion-icon>
             </a>
-            <a href="https://www.instagram.com/valpaws.ph/" target="_blank" rel="noopener noreferrer" className="w-10 h-10 rounded-full border border-white/20 flex items-center justify-center text-white/70 hover:text-[#15803d] hover:bg-white hover:border-white transition-all duration-300 shadow-md hover:scale-110 active:scale-95 cursor-pointer">
+            <a href="https://www.instagram.com/valenzuelacitygov/" target="_blank" rel="noopener noreferrer" className="w-10 h-10 rounded-full border border-white/20 flex items-center justify-center text-white/70 hover:text-[#15803d] hover:bg-white hover:border-white transition-all duration-300 shadow-md hover:scale-110 active:scale-95 cursor-pointer" title="Instagram">
               <ion-icon name="logo-instagram" style={{ fontSize: '20px' }}></ion-icon>
             </a>
-            <a href="https://www.youtube.com/@ValPawsPH" target="_blank" rel="noopener noreferrer" className="w-10 h-10 rounded-full border border-white/20 flex items-center justify-center text-white/70 hover:text-[#15803d] hover:bg-white hover:border-white transition-all duration-300 shadow-md hover:scale-110 active:scale-95 cursor-pointer">
+            <a href="https://www.youtube.com/@valenzuelacity" target="_blank" rel="noopener noreferrer" className="w-10 h-10 rounded-full border border-white/20 flex items-center justify-center text-white/70 hover:text-[#15803d] hover:bg-white hover:border-white transition-all duration-300 shadow-md hover:scale-110 active:scale-95 cursor-pointer" title="YouTube">
               <ion-icon name="logo-youtube" style={{ fontSize: '20px' }}></ion-icon>
             </a>
-            <a href="https://www.tiktok.com/@valpaws_ph" target="_blank" rel="noopener noreferrer" className="w-10 h-10 rounded-full border border-white/20 flex items-center justify-center text-white/70 hover:text-[#15803d] hover:bg-white hover:border-white transition-all duration-300 shadow-md hover:scale-110 active:scale-95 cursor-pointer">
+            <a href="https://www.tiktok.com/@valenzuelacitygov" target="_blank" rel="noopener noreferrer" className="w-10 h-10 rounded-full border border-white/20 flex items-center justify-center text-white/70 hover:text-[#15803d] hover:bg-white hover:border-white transition-all duration-300 shadow-md hover:scale-110 active:scale-95 cursor-pointer" title="TikTok">
               <ion-icon name="logo-tiktok" style={{ fontSize: '20px' }}></ion-icon>
-            </a>
-            <a href="https://www.linkedin.com/company/valpaws/" target="_blank" rel="noopener noreferrer" className="w-10 h-10 rounded-full border border-white/20 flex items-center justify-center text-white/70 hover:text-[#15803d] hover:bg-white hover:border-white transition-all duration-300 shadow-md hover:scale-110 active:scale-95 cursor-pointer">
-              <ion-icon name="logo-linkedin" style={{ fontSize: '20px' }}></ion-icon>
             </a>
           </div>
 
