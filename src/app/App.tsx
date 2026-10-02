@@ -56,7 +56,7 @@ import redAsset from "../imports/placeholder_image.png";
 // @ts-ignore
 import yellowAsset from "../imports/placeholder_image.png";
 // @ts-ignore
-import valpawsBgPng from "../imports/valpaws_background.png";
+import valpawsBgPng from "../imports/valpaws_background.jpg";
 
 // Interactive dashboard features metadata
 const dashboardFeatures = [
