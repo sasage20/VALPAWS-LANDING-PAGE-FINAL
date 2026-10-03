@@ -705,23 +705,25 @@ export default function App() {
         <a
           href="#home"
           ref={headerLogoRef}
-          className="flex items-center gap-1 md:gap-1.5 shrink-0 cursor-pointer hover:opacity-90 transition-opacity duration-150"
+          className="group flex items-center gap-1.5 md:gap-2 shrink-0 cursor-pointer select-none transition-transform duration-200 active:scale-[0.98]"
           style={{ opacity: slideSplashPanel ? 1 : 0, transition: slideSplashPanel ? "opacity 0.15s ease-out" : "opacity 0.3s ease-out" }}
         >
           <img
             src={valpawsIcon}
             alt="ValPaws Logo Icon"
-            className={`h-9 w-9 md:h-12 md:w-12 object-contain transition-all duration-[1000ms] cubic-bezier(0.34, 1.56, 0.64, 1) ${slideSplashPanel ? "scale-100 opacity-100" : "scale-0 opacity-0"
+            className={`h-9 w-9 md:h-12 md:w-12 object-contain transition-all duration-300 ease-out transform group-hover:scale-110 group-hover:-rotate-3 group-hover:drop-shadow-[0_4px_12px_rgba(21,128,61,0.28)] ${slideSplashPanel ? "scale-100 opacity-100" : "scale-0 opacity-0 duration-[1000ms] cubic-bezier(0.34, 1.56, 0.64, 1)"
               }`}
           />
           <div
-            className={`overflow-hidden flex items-center transition-all duration-[1000ms] ease-out ${slideSplashPanel ? "max-w-[300px] opacity-100 translate-x-0" : "max-w-0 opacity-0 -translate-x-6"
+            className={`flex items-center transition-all duration-[1000ms] ease-out ${slideSplashPanel
+                ? "max-w-[300px] opacity-100 translate-x-0 overflow-visible"
+                : "max-w-0 opacity-0 -translate-x-6 overflow-hidden"
               }`}
           >
             <img
               src={valpawsLettermark}
               alt="ValPaws Lettermark"
-              className="h-7 md:h-9 w-auto object-contain"
+              className="h-7 md:h-9 w-auto object-contain transition-all duration-300 ease-out transform origin-left group-hover:scale-105 group-hover:brightness-105 group-hover:drop-shadow-[0_2px_8px_rgba(21,128,61,0.2)]"
             />
           </div>
         </a>
