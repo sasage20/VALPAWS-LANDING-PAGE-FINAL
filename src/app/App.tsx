@@ -34,8 +34,11 @@ import {
   Download,
   BookOpen,
   Smartphone,
-  ShieldCheck
+  ShieldCheck,
+  FileText
 } from "lucide-react";
+
+import TermsAndConditionsModal, { TERMS_STORAGE_KEY } from "./components/TermsAndConditionsModal";
 
 // @ts-ignore
 import confetti from "canvas-confetti";
@@ -180,6 +183,38 @@ export default function App() {
   const [onboardingVisible, setOnboardingVisible] = useState(false);
   const [prefersReducedMotion, setPrefersReducedMotion] = useState(false);
   const headerLogoRef = useRef<HTMLAnchorElement>(null);
+
+  // Helper to check if current URL points to the terms and conditions link
+  const isTermsUrl = () => {
+    if (typeof window === "undefined") return false;
+    const hash = (window.location.hash || "").toLowerCase();
+    const search = (window.location.search || "").toLowerCase();
+    const pathname = (window.location.pathname || "").toLowerCase();
+
+    return (
+      hash === "#terms" ||
+      hash === "#terms-and-conditions" ||
+      hash === "#privacy" ||
+      hash.startsWith("#terms") ||
+      search.includes("terms=true") ||
+      search.includes("terms=1") ||
+      search.includes("modal=terms") ||
+      pathname.endsWith("/terms") ||
+      pathname.endsWith("/terms-and-conditions")
+    );
+  };
+
+  // Terms and Conditions Modal State (only opens via terms link from separate app)
+  const [isTermsModalOpen, setIsTermsModalOpen] = useState(false);
+
+  const handleCloseTerms = () => {
+    setIsTermsModalOpen(false);
+    if (isTermsUrl()) {
+      try {
+        window.history.pushState(null, "", window.location.pathname);
+      } catch {}
+    }
+  };
 
   // Form split state
   const [activeForm, setActiveForm] = useState<'split' | 'merchant' | 'reseller'>('split');
@@ -494,11 +529,33 @@ export default function App() {
     if ('scrollRestoration' in window.history) {
       window.history.scrollRestoration = 'manual';
     }
-    // Force the hash to be #home and scroll to top immediately
-    window.scrollTo(0, 0);
-    if (window.location.hash !== "#home") {
-      window.location.hash = "#home";
+    // Check if initial URL directs to the terms link from the separate application
+    if (isTermsUrl()) {
+      setIsTermsModalOpen(true);
+      setShowSplash(false);
+    } else {
+      window.scrollTo(0, 0);
+      if (window.location.hash !== "#home") {
+        window.location.hash = "#home";
+      }
     }
+  }, []);
+
+  // Listen to hash and popstate changes (when user is redirected to terms link)
+  useEffect(() => {
+    const handleUrlCheck = () => {
+      if (isTermsUrl()) {
+        setIsTermsModalOpen(true);
+        setShowSplash(false);
+      }
+    };
+
+    window.addEventListener("hashchange", handleUrlCheck);
+    window.addEventListener("popstate", handleUrlCheck);
+    return () => {
+      window.removeEventListener("hashchange", handleUrlCheck);
+      window.removeEventListener("popstate", handleUrlCheck);
+    };
   }, []);
 
   useEffect(() => {
@@ -1776,9 +1833,15 @@ export default function App() {
 
         {/* Copyright Bar */}
         <div className="bg-black border-t border-white/10 py-5 text-center text-sm font-normal tracking-wide text-white/60">
-          &copy; 2025 ValPaws. All Rights Reserved.
+          &copy; 2026 ValPaws. All Rights Reserved.
         </div>
       </footer>
+
+      {/* TERMS & CONDITIONS MODAL (Triggered when opened via terms link from the separate app) */}
+      <TermsAndConditionsModal
+        isOpen={isTermsModalOpen}
+        onClose={handleCloseTerms}
+      />
 
     </div>
   );
