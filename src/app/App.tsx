@@ -38,7 +38,7 @@ import {
   FileText
 } from "lucide-react";
 
-import TermsAndConditionsModal, { TERMS_STORAGE_KEY } from "./components/TermsAndConditionsModal";
+import TermsAndConditionsModal from "./components/TermsAndConditionsModal";
 
 // @ts-ignore
 import confetti from "canvas-confetti";

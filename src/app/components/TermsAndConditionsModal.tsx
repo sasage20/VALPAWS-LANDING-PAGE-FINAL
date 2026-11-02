@@ -3,7 +3,6 @@ import {
   ShieldCheck,
   X,
   Scale,
-  Printer,
   Calendar,
   Phone,
   Mail,
@@ -48,9 +47,6 @@ export default function TermsAndConditionsModal({
     };
   }, [isOpen]);
 
-  const handlePrint = () => {
-    window.print();
-  };
 
   const scrollToSection = (sectionId: string) => {
     setActiveSection(sectionId);
@@ -109,20 +105,12 @@ export default function TermsAndConditionsModal({
             </div>
           </div>
 
-          <div className="flex items-center gap-2">
-            <button
-              type="button"
-              onClick={handlePrint}
-              title="Print document"
-              className="p-2 text-white/80 hover:text-white hover:bg-white/15 rounded-full transition-all cursor-pointer hidden md:flex items-center justify-center"
-            >
-              <Printer className="w-5 h-5" />
-            </button>
+          <div className="flex items-center">
             <button
               type="button"
               onClick={onClose}
               className="w-9 h-9 sm:w-10 sm:h-10 rounded-full bg-white/15 hover:bg-white text-white hover:text-[#15803d] flex items-center justify-center transition-all cursor-pointer border border-white/20 shadow-sm active:scale-95"
-              title="Close modal"
+              title="Close terms"
               aria-label="Close"
             >
               <X className="w-5 h-5 font-bold" />
@@ -757,11 +745,11 @@ export default function TermsAndConditionsModal({
           </div>
         </div>
 
-        {/* ================= MODAL FOOTER: PURELY FOR READING WITH CLOSE BUTTON ================= */}
-        <div className="bg-slate-50 border-t-2 border-slate-200 px-5 py-4 sm:px-8 sm:py-4 flex items-center justify-between gap-4 shrink-0 shadow-inner">
+        {/* ================= MODAL FOOTER: PURELY FOR READING WITH CLOSE BUTTON ONLY ================= */}
+        <div className="bg-slate-50 border-t-2 border-slate-200 px-5 py-4 sm:px-8 sm:py-4 flex flex-col sm:flex-row items-center justify-between gap-3 shrink-0 shadow-inner">
           <div className="flex items-center gap-2 text-xs text-slate-500">
             <ShieldCheck className="w-4 h-4 text-[#15803d]" />
-            <span className="font-medium">ValPaws Official Terms of Service & Privacy Notice</span>
+            <span className="font-medium">ValPaws Official Terms and Conditions & Data Privacy Notice</span>
           </div>
 
           {/* Only Keep the Close Button */}
@@ -769,7 +757,7 @@ export default function TermsAndConditionsModal({
             type="button"
             id="close-terms-button"
             onClick={onClose}
-            className="px-8 py-2.5 rounded-full bg-[#15803d] hover:bg-[#166534] text-white font-bold text-xs sm:text-sm uppercase tracking-wider transition-all cursor-pointer shadow-md hover:shadow-lg hover:scale-105 active:scale-95 flex items-center gap-1.5"
+            className="w-full sm:w-auto px-8 py-2.5 rounded-full bg-[#15803d] hover:bg-[#166534] text-white font-bold text-xs sm:text-sm uppercase tracking-wider transition-all cursor-pointer shadow-md hover:shadow-lg hover:scale-105 active:scale-95 flex items-center justify-center gap-1.5"
           >
             <X className="w-4 h-4 stroke-[3]" />
             Close
