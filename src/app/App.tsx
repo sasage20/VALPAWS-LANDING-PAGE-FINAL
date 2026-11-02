@@ -172,40 +172,41 @@ const faqData: Record<string, Array<{ q: string; a: string }>> = {
   ]
 };
 
+// Helper to check if current URL points to the terms and conditions link
+function isTermsUrl(): boolean {
+  if (typeof window === "undefined") return false;
+  const hash = (window.location.hash || "").toLowerCase();
+  const search = (window.location.search || "").toLowerCase();
+  const pathname = (window.location.pathname || "").toLowerCase();
+
+  return (
+    hash === "#terms" ||
+    hash === "#terms-and-conditions" ||
+    hash === "#privacy" ||
+    hash.startsWith("#terms") ||
+    search.includes("terms") ||
+    search.includes("modal=terms") ||
+    pathname.endsWith("/terms") ||
+    pathname.endsWith("/terms-and-conditions")
+  );
+}
+
 export default function App() {
   const [activeId, setActiveId] = useState(1);
   const [isAboutExpanded, setIsAboutExpanded] = useState(false);
   const [isPlayingVideo, setIsPlayingVideo] = useState(false);
   const [videoSrcType, setVideoSrcType] = useState<'youtube' | 'sample'>('youtube');
-  const [showSplash, setShowSplash] = useState(true);
+  
+  // Terms and Conditions Modal State (immediately true if opened via terms link)
+  const [isTermsModalOpen, setIsTermsModalOpen] = useState<boolean>(() => isTermsUrl());
+  // Skip splash screen immediately if opened via terms link
+  const [showSplash, setShowSplash] = useState<boolean>(() => !isTermsUrl());
+
   const [fadeSplashText, setFadeSplashText] = useState(false);
   const [slideSplashPanel, setSlideSplashPanel] = useState(false);
   const [onboardingVisible, setOnboardingVisible] = useState(false);
   const [prefersReducedMotion, setPrefersReducedMotion] = useState(false);
   const headerLogoRef = useRef<HTMLAnchorElement>(null);
-
-  // Helper to check if current URL points to the terms and conditions link
-  const isTermsUrl = () => {
-    if (typeof window === "undefined") return false;
-    const hash = (window.location.hash || "").toLowerCase();
-    const search = (window.location.search || "").toLowerCase();
-    const pathname = (window.location.pathname || "").toLowerCase();
-
-    return (
-      hash === "#terms" ||
-      hash === "#terms-and-conditions" ||
-      hash === "#privacy" ||
-      hash.startsWith("#terms") ||
-      search.includes("terms=true") ||
-      search.includes("terms=1") ||
-      search.includes("modal=terms") ||
-      pathname.endsWith("/terms") ||
-      pathname.endsWith("/terms-and-conditions")
-    );
-  };
-
-  // Terms and Conditions Modal State (only opens via terms link from separate app)
-  const [isTermsModalOpen, setIsTermsModalOpen] = useState(false);
 
   const handleCloseTerms = () => {
     setIsTermsModalOpen(false);

@@ -145,7 +145,7 @@ export default function TermsAndConditionsModal({
       role="dialog"
       aria-modal="true"
       aria-labelledby="terms-modal-title"
-      className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-5 md:p-8 bg-black/80 backdrop-blur-md animate-fade-in"
+      className="fixed inset-0 z-[99999] flex items-center justify-center p-3 sm:p-5 md:p-8 bg-black/80 backdrop-blur-md animate-fade-in"
       onClick={(e) => {
         if (e.target === e.currentTarget) {
           onClose();
