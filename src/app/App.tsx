@@ -583,13 +583,13 @@ export default function App() {
   }, []);
 
   useEffect(() => {
-    if (!showSplash) {
+    if (!showSplash || slideSplashPanel) {
       const timer = setTimeout(() => {
         setIsPlayingVideo(true);
       }, 3000);
       return () => clearTimeout(timer);
     }
-  }, [showSplash]);
+  }, [showSplash, slideSplashPanel]);
 
   useEffect(() => {
     const mediaQuery = window.matchMedia('(prefers-reduced-motion: reduce)');
@@ -597,19 +597,24 @@ export default function App() {
   }, []);
 
   useEffect(() => {
+    if (typeof navigator !== 'undefined' && !navigator.onLine) {
+      setVideoSrcType('sample');
+      return;
+    }
     const img = new Image();
-    img.src = "https://www.youtube-nocookie.com/favicon.ico?" + new Date().getTime();
+    img.src = "https://www.youtube.com/favicon.ico?" + new Date().getTime();
     const timeout = setTimeout(() => {
       img.src = "";
-      setVideoSrcType('sample');
-    }, 2500);
+    }, 3000);
     img.onload = () => {
       clearTimeout(timeout);
       setVideoSrcType('youtube');
     };
     img.onerror = () => {
       clearTimeout(timeout);
-      setVideoSrcType('sample');
+      if (typeof navigator !== 'undefined' && !navigator.onLine) {
+        setVideoSrcType('sample');
+      }
     };
   }, []);
 
@@ -864,8 +869,8 @@ export default function App() {
               {/* CTA Buttons */}
               <div className="mt-6 flex flex-wrap items-center justify-start gap-4 w-full" style={{ fontFamily: "'Inter', sans-serif" }}>
                 <a
-                  href="https://github.com/sasage20/VALPAWS-APK/releases/latest/download/21.Sep.2026.ValPaws.apk"
-                  download="21.Sep.2026.ValPaws.apk"
+                  href="https://github.com/sasage20/VALPAWS-APK/releases/download/v1.0.0/3.Nov.2026.ValPaws.apk"
+                  download="3.Nov.2026.ValPaws.apk"
                   onClick={() => {
                     setActiveForm('reseller');
                     document.getElementById('onboarding-section')?.scrollIntoView({ behavior: 'smooth' });
@@ -911,11 +916,16 @@ export default function App() {
                   >
                     {/* Thumbnail Image */}
                     <img
-                      src="https://img.youtube.com/vi/Om4hdkUWYeg/maxresdefault.jpg"
+                      src="https://img.youtube.com/vi/5lQqf9SePRI/maxresdefault.jpg"
                       alt="Video Thumbnail"
                       className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700"
                       onError={(e) => {
-                        (e.target as HTMLImageElement).src = asset1;
+                        const target = e.target as HTMLImageElement;
+                        if (!target.src.includes('hqdefault')) {
+                          target.src = "https://img.youtube.com/vi/5lQqf9SePRI/hqdefault.jpg";
+                        } else {
+                          target.src = asset1;
+                        }
                       }}
                     />
                     {/* Dark Overlay */}
@@ -930,16 +940,11 @@ export default function App() {
                         <path d="M8 5v14l11-7z" />
                       </svg>
                     </div>
-
-                    {/* Duration Badge */}
-                    <div className="absolute bottom-4 right-4 bg-black/75 px-3 py-1 rounded-md text-xs font-semibold text-white">
-                      18:28
-                    </div>
                   </div>
                 ) : videoSrcType === 'youtube' ? (
                   <iframe
                     className="w-full h-full"
-                    src="https://www.youtube-nocookie.com/embed/Om4hdkUWYeg?start=772&autoplay=1"
+                    src="https://www.youtube-nocookie.com/embed/5lQqf9SePRI?autoplay=1&mute=1&playsinline=1"
                     title="ValPaws NFC Pet Identification Demo Video"
                     allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
                     allowFullScreen
@@ -951,6 +956,7 @@ export default function App() {
                     src="https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerBlazes.mp4"
                     controls
                     autoPlay
+                    muted
                   />
                 )}
               </div>
@@ -1556,7 +1562,7 @@ export default function App() {
                             <span className="w-7 h-7 rounded-full bg-[#15803d] text-white font-black text-xs flex items-center justify-center shrink-0 mt-0.5 shadow-sm">1</span>
                             <div>
                               <h5 className="text-xs font-bold text-slate-900 uppercase">Download APK Package</h5>
-                              <p className="text-[11px] text-slate-600 font-medium">Click the button below to download the latest <code>21.Sep.2026.ValPaws.apk</code> file.</p>
+                              <p className="text-[11px] text-slate-600 font-medium">Click the button below to download the latest <code>3.Nov.2026.ValPaws.apk</code> file.</p>
                             </div>
                           </div>
 
@@ -1587,8 +1593,8 @@ export default function App() {
 
                         <div className="mt-4 flex flex-col sm:flex-row items-center justify-between gap-3 pt-3 border-t border-slate-100">
                           <a
-                            href="https://github.com/sasage20/VALPAWS-APK/releases/latest/download/21.Sep.2026.ValPaws.apk"
-                            download="21.Sep.2026.ValPaws.apk"
+                            href="https://github.com/sasage20/VALPAWS-APK/releases/download/v1.0.0/3.Nov.2026.ValPaws.apk"
+                            download="3.Nov.2026.ValPaws.apk"
                             className="bg-[#15803d] hover:bg-[#166534] text-white px-6 py-2.5 rounded-full font-extrabold text-xs uppercase tracking-wider transition-all flex items-center justify-center gap-2 shadow-sm hover:scale-105 active:scale-95"
                           >
                             <Download className="w-4 h-4" />
@@ -1690,7 +1696,7 @@ export default function App() {
                           <div className="space-y-2 text-xs font-medium text-slate-300 font-sans mb-4">
                             <div className="flex justify-between border-b border-slate-800 pb-1">
                               <span className="text-slate-400">Filename:</span>
-                              <span className="font-mono text-[11px] text-emerald-400 font-bold">21.Sep.2026.ValPaws.apk</span>
+                              <span className="font-mono text-[11px] text-emerald-400 font-bold">3.Nov.2026.ValPaws.apk</span>
                             </div>
                             <div className="flex justify-between border-b border-slate-800 pb-1">
                               <span className="text-slate-400">File Size:</span>
@@ -1702,7 +1708,7 @@ export default function App() {
                             </div>
                             <div className="flex justify-between border-b border-slate-800 pb-1">
                               <span className="text-slate-400">Build Date:</span>
-                              <span className="font-bold text-white">Sept 21, 2026</span>
+                              <span className="font-bold text-white">Nov 3, 2026</span>
                             </div>
                           </div>
                           <div className="bg-emerald-950/80 p-3 rounded-xl border border-emerald-500/30 text-[11px] font-semibold text-emerald-300">
@@ -1742,8 +1748,8 @@ export default function App() {
 
                         <div className="pt-4 border-t border-slate-150 flex flex-col sm:flex-row items-center justify-between gap-3">
                           <a
-                            href="https://github.com/sasage20/VALPAWS-APK/releases/latest/download/21.Sep.2026.ValPaws.apk"
-                            download="21.Sep.2026.ValPaws.apk"
+                            href="https://github.com/sasage20/VALPAWS-APK/releases/download/v1.0.0/3.Nov.2026.ValPaws.apk"
+                            download="3.Nov.2026.ValPaws.apk"
                             className="w-full sm:w-auto bg-[#15803d] hover:bg-[#166534] text-white px-7 py-3 rounded-full font-extrabold text-xs uppercase tracking-wider transition-all flex items-center justify-center gap-2 shadow-md hover:shadow-lg cursor-pointer hover:scale-105 active:scale-95"
                           >
                             <Download className="w-4 h-4" />
