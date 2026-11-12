@@ -195,7 +195,6 @@ export default function App() {
   const [activeId, setActiveId] = useState(1);
   const [isAboutExpanded, setIsAboutExpanded] = useState(false);
   const [isPlayingVideo, setIsPlayingVideo] = useState(false);
-  const [videoSrcType, setVideoSrcType] = useState<'youtube' | 'sample'>('youtube');
   
   // Terms and Conditions Modal State (immediately true if opened via terms link)
   const [isTermsModalOpen, setIsTermsModalOpen] = useState<boolean>(() => isTermsUrl());
@@ -207,6 +206,8 @@ export default function App() {
   const [onboardingVisible, setOnboardingVisible] = useState(false);
   const [prefersReducedMotion, setPrefersReducedMotion] = useState(false);
   const headerLogoRef = useRef<HTMLAnchorElement>(null);
+  const hasUserInteractedRef = useRef(false);
+  const autoplayTimerRef = useRef<NodeJS.Timeout | null>(null);
 
   const handleCloseTerms = () => {
     setIsTermsModalOpen(false);
@@ -582,40 +583,75 @@ export default function App() {
     };
   }, []);
 
+  // Autoplay video only after 3 seconds on the landing page
   useEffect(() => {
-    if (!showSplash || slideSplashPanel) {
-      const timer = setTimeout(() => {
+    if (autoplayTimerRef.current) return;
+
+    if (slideSplashPanel || !showSplash) {
+      autoplayTimerRef.current = setTimeout(() => {
         setIsPlayingVideo(true);
       }, 3000);
-      return () => clearTimeout(timer);
     }
-  }, [showSplash, slideSplashPanel]);
+  }, [slideSplashPanel, showSplash]);
+
+  useEffect(() => {
+    return () => {
+      if (autoplayTimerRef.current) {
+        clearTimeout(autoplayTimerRef.current);
+      }
+    };
+  }, []);
+
+  // Set YouTube volume to 50% and unmute on first user interaction
+  useEffect(() => {
+    if (!isPlayingVideo) return;
+
+    const iframe = document.getElementById('valpaws-yt-player') as HTMLIFrameElement | null;
+    if (!iframe) return;
+
+    // Send half volume (50%) to the player without unmuting so browser autoplay is never interrupted
+    const applyHalfVolume = () => {
+      iframe.contentWindow?.postMessage(
+        JSON.stringify({ event: 'command', func: 'setVolume', args: [50] }),
+        '*'
+      );
+      if (hasUserInteractedRef.current) {
+        iframe.contentWindow?.postMessage(
+          JSON.stringify({ event: 'command', func: 'unMute', args: [] }),
+          '*'
+        );
+      }
+    };
+
+    const t1 = setTimeout(applyHalfVolume, 500);
+    const t2 = setTimeout(applyHalfVolume, 1200);
+
+    // Unmute with sound at 50% as soon as the user interacts with the page
+    const handleGesture = () => {
+      hasUserInteractedRef.current = true;
+      applyHalfVolume();
+      iframe.contentWindow?.postMessage(
+        JSON.stringify({ event: 'command', func: 'unMute', args: [] }),
+        '*'
+      );
+    };
+
+    window.addEventListener('click', handleGesture, { once: true });
+    window.addEventListener('touchstart', handleGesture, { once: true });
+    window.addEventListener('keydown', handleGesture, { once: true });
+
+    return () => {
+      clearTimeout(t1);
+      clearTimeout(t2);
+      window.removeEventListener('click', handleGesture);
+      window.removeEventListener('touchstart', handleGesture);
+      window.removeEventListener('keydown', handleGesture);
+    };
+  }, [isPlayingVideo]);
 
   useEffect(() => {
     const mediaQuery = window.matchMedia('(prefers-reduced-motion: reduce)');
     setPrefersReducedMotion(mediaQuery.matches);
-  }, []);
-
-  useEffect(() => {
-    if (typeof navigator !== 'undefined' && !navigator.onLine) {
-      setVideoSrcType('sample');
-      return;
-    }
-    const img = new Image();
-    img.src = "https://www.youtube.com/favicon.ico?" + new Date().getTime();
-    const timeout = setTimeout(() => {
-      img.src = "";
-    }, 3000);
-    img.onload = () => {
-      clearTimeout(timeout);
-      setVideoSrcType('youtube');
-    };
-    img.onerror = () => {
-      clearTimeout(timeout);
-      if (typeof navigator !== 'undefined' && !navigator.onLine) {
-        setVideoSrcType('sample');
-      }
-    };
   }, []);
 
   useEffect(() => {
@@ -896,33 +932,26 @@ export default function App() {
 
             {/* Right Column: Playable Video Player (Now 6/12 Width) */}
             <div className="lg:col-span-6 flex justify-center lg:justify-end animate-fade-in-up delay-200 w-full relative">
-              <div className="w-full aspect-[3/2] rounded-[3rem] overflow-hidden shadow-[0_25px_60px_-15px_rgba(0,0,0,0.35)] hover:shadow-[0_30px_70px_-10px_rgba(21,128,61,0.25)] transition-all duration-500 bg-black relative group cursor-pointer">
-                {isPlayingVideo && (
-                  <button
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      setVideoSrcType(videoSrcType === 'youtube' ? 'sample' : 'youtube');
-                    }}
-                    className="absolute top-4 right-4 z-10 bg-black/60 hover:bg-black/90 text-white/90 hover:text-white px-3 py-1.5 rounded-full text-xs font-semibold tracking-wide transition-all select-none backdrop-blur-sm shadow-md cursor-pointer"
-                  >
-                    {videoSrcType === 'youtube' ? '🔌 Switch to Offline Sample' : '📺 Switch to YouTube'}
-                  </button>
-                )}
-
+              <div className={`w-full aspect-[3/2] rounded-[3rem] overflow-hidden bg-black relative transition-all duration-500 shadow-[0_25px_60px_-15px_rgba(0,0,0,0.35)] ${
+                !isPlayingVideo ? 'hover:shadow-[0_30px_70px_-10px_rgba(21,128,61,0.25)] group cursor-pointer' : 'cursor-default'
+              }`}>
                 {!isPlayingVideo ? (
                   <div
                     className="absolute inset-0 w-full h-full flex items-center justify-center"
-                    onClick={() => setIsPlayingVideo(true)}
+                    onClick={() => {
+                      hasUserInteractedRef.current = true;
+                      setIsPlayingVideo(true);
+                    }}
                   >
                     {/* Thumbnail Image */}
                     <img
-                      src="https://img.youtube.com/vi/5lQqf9SePRI/maxresdefault.jpg"
+                      src="https://img.youtube.com/vi/SQsesn0g8oE/maxresdefault.jpg"
                       alt="Video Thumbnail"
                       className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700"
                       onError={(e) => {
                         const target = e.target as HTMLImageElement;
                         if (!target.src.includes('hqdefault')) {
-                          target.src = "https://img.youtube.com/vi/5lQqf9SePRI/hqdefault.jpg";
+                          target.src = "https://img.youtube.com/vi/SQsesn0g8oE/hqdefault.jpg";
                         } else {
                           target.src = asset1;
                         }
@@ -941,23 +970,16 @@ export default function App() {
                       </svg>
                     </div>
                   </div>
-                ) : videoSrcType === 'youtube' ? (
+                ) : (
                   <iframe
+                    id="valpaws-yt-player"
                     className="w-full h-full"
-                    src="https://www.youtube-nocookie.com/embed/5lQqf9SePRI?autoplay=1&mute=1&playsinline=1"
+                    src="https://www.youtube.com/embed/SQsesn0g8oE?autoplay=1&mute=1&playsinline=1&enablejsapi=1"
                     title="ValPaws NFC Pet Identification Demo Video"
                     allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
                     allowFullScreen
                     style={{ border: 0 }}
                   ></iframe>
-                ) : (
-                  <video
-                    className="w-full h-full object-cover"
-                    src="https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerBlazes.mp4"
-                    controls
-                    autoPlay
-                    muted
-                  />
                 )}
               </div>
             </div>
